@@ -6,6 +6,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using NLog;
 using NzbDrone.Common.EnsureThat;
+using NzbDrone.Common.Http;
 using NzbDrone.Core.Exceptions;
 using NzbDrone.Core.MetadataSource;
 using NzbDrone.Core.Organizer;
@@ -99,6 +100,15 @@ namespace NzbDrone.Core.Movies
                     }
 
                     _logger.Debug("TmdbId {0} was not added due to validation failures. {1}", m.ForeignId, ex.Message);
+                }
+                catch (HttpException ex)
+                {
+                    if (!ignoreErrors)
+                    {
+                        throw;
+                    }
+
+                    _logger.Debug("TmdbId {0} was not added due to connection failures. {1}", m.ForeignId, ex.Message);
                 }
             }
 
