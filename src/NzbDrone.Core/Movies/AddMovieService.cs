@@ -6,6 +6,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using NLog;
 using NzbDrone.Common.EnsureThat;
+using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Http;
 using NzbDrone.Core.Exceptions;
 using NzbDrone.Core.MetadataSource;
@@ -73,6 +74,21 @@ namespace NzbDrone.Core.Movies
 
                 try
                 {
+                    if (m.ForeignId.IsNotNullOrWhiteSpace())
+                    {
+                        if (existingMovieForeignIds.Any(f => f == m.ForeignId))
+                        {
+                            _logger.Debug("Foreign ID {0} was not added due to validation failure: Movie already exists in database", m.ForeignId);
+                            continue;
+                        }
+
+                        if (moviesToAdd.Any(f => f.ForeignId == m.ForeignId))
+                        {
+                            _logger.Debug("Foreign ID {0} was not added due to validation failure: Movie already exists on list", m.ForeignId);
+                            continue;
+                        }
+                    }
+
                     var movie = AddSkyhookData(m);
                     movie = SetPropertiesAndValidate(movie);
 
