@@ -207,21 +207,14 @@ namespace NzbDrone.Core.Movies.Performers
                             updatePerformers.Contains(performer.ForeignId) ||
                             message.Trigger == CommandTrigger.Manual)
                         {
-                            try
-                            {
-                                performerLocal = RefreshPerformerInfo(performerLocal.Id);
-                            }
-                            catch (Exception e)
-                            {
-                                _logger.Error(e, "Couldn't refresh info for {0}", performer.Name);
-                            }
+                            performerLocal = RefreshPerformerInfo(performerLocal.Id);
                         }
 
-                        SyncPerformerItems(performer);
+                        SyncPerformerItems(performerLocal);
                     }
-                    catch (MovieNotFoundException)
+                    catch (Exception e)
                     {
-                        _logger.Error("Performer '{0}' (StashDb {1}) was not found, it may have been removed from The Movie Database.", performer.Name, performer.ForeignId);
+                        _logger.Error(e, "Couldn't refresh info for {0}", performer.Name);
                     }
                 }
             }
