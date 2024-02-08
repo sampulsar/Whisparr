@@ -207,7 +207,14 @@ namespace NzbDrone.Core.Movies.Performers
                             updatePerformers.Contains(performer.ForeignId) ||
                             message.Trigger == CommandTrigger.Manual)
                         {
-                            performerLocal = RefreshPerformerInfo(performerLocal.Id);
+                            try
+                            {
+                                performerLocal = RefreshPerformerInfo(performerLocal.Id);
+                            }
+                            catch (Exception e)
+                            {
+                                _logger.Error(e, "Couldn't refresh info for {0}", performer.Name);
+                            }
                         }
 
                         SyncPerformerItems(performer);
