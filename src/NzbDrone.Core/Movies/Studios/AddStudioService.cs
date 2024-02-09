@@ -48,7 +48,14 @@ namespace NzbDrone.Core.Movies.Studios
 
             _logger.Info("Adding Studio {0}", newStudio.Title);
 
-            _studioService.AddStudio(newStudio);
+            try
+            {
+                _studioService.AddStudio(newStudio);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("Error Adding Studio {0}", newStudio.Title, ex);
+            }
 
             return newStudio;
         }
@@ -92,6 +99,15 @@ namespace NzbDrone.Core.Movies.Studios
                     }
 
                     _logger.Debug("StashId {0} was not added due to validation failures. {1}", m.ForeignId, ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    if (!ignoreErrors)
+                    {
+                        throw;
+                    }
+
+                    _logger.Error("StashId {0} was not added due to an exception. {1}", m.ForeignId, ex.Message);
                 }
             }
 
