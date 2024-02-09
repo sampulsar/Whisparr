@@ -42,7 +42,14 @@ namespace NzbDrone.Core.Movies.Performers
 
             _logger.Info("Adding Performer {0}", newPerformer.Name);
 
-            _performerService.AddPerformer(newPerformer);
+            try
+            {
+                _performerService.AddPerformer(newPerformer);
+            }
+            catch (Exception ex)
+            {
+                _logger.Debug("StashId {0} was not added due to Exception. {1}", newPerformer.ForeignId, ex.Message);
+            }
 
             return newPerformer;
         }
@@ -100,7 +107,16 @@ namespace NzbDrone.Core.Movies.Performers
                         throw;
                     }
 
-                    _logger.Debug("TmdbId {0} was not added due to validation failures. {1}", m.ForeignId, ex.Message);
+                    _logger.Debug("StashId {0} was not added due to validation failures. {1}", m.ForeignId, ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    if (!ignoreErrors)
+                    {
+                        throw;
+                    }
+
+                    _logger.Debug("StashId {0} was not added due to Exception. {1}", m.ForeignId, ex.Message);
                 }
             }
 
