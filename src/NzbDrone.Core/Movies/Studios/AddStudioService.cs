@@ -13,7 +13,7 @@ namespace NzbDrone.Core.Movies.Studios
 {
     public interface IAddStudioService
     {
-        Studio AddStudio(Studio newStudio);
+        Studio AddStudio(Studio newStudio, bool ignoreErrors = false);
         List<Studio> AddStudios(List<Studio> newStudios, bool ignoreErrors = false);
     }
 
@@ -32,7 +32,7 @@ namespace NzbDrone.Core.Movies.Studios
             _logger = logger;
         }
 
-        public Studio AddStudio(Studio newStudio)
+        public Studio AddStudio(Studio newStudio, bool ignoreErrors = false)
         {
             Ensure.That(newStudio, () => newStudio).IsNotNull();
 
@@ -54,6 +54,11 @@ namespace NzbDrone.Core.Movies.Studios
             }
             catch (Exception ex)
             {
+                if (!ignoreErrors)
+                {
+                    throw;
+                }
+
                 _logger.Error("Error Adding Studio {0}", newStudio.Title, ex);
             }
 

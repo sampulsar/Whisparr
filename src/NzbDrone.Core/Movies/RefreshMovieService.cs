@@ -138,7 +138,7 @@ namespace NzbDrone.Core.Movies
                     QualityProfileId = movie.QualityProfileId,
                     RootFolderPath = _folderService.GetBestRootFolderPath(movie.Path),
                     Tags = movie.Tags
-                });
+                }, true);
 
                 if (newCollection != null)
                 {
@@ -161,7 +161,7 @@ namespace NzbDrone.Core.Movies
                 p.Tags = movie.Tags;
             });
 
-            _performerService.AddPerformers(performerInfo);
+            _performerService.AddPerformers(performerInfo, true);
 
             _movieMetadataService.Upsert(movieMetadata);
 

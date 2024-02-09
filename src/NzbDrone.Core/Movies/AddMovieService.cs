@@ -137,7 +137,20 @@ namespace NzbDrone.Core.Movies
                 }
             }
 
-            _movieMetadataService.UpsertMany(moviesToAdd.Select(x => x.MovieMetadata.Value).ToList());
+            try
+            {
+                _movieMetadataService.UpsertMany(moviesToAdd.Select(x => x.MovieMetadata.Value).ToList());
+            }
+            catch (Exception ex)
+            {
+                if (!ignoreErrors)
+                {
+                    throw;
+                }
+
+                _logger.Debug("Failures adding metadata.", ex.Message);
+            }
+
             moviesToAdd.ForEach(x => x.MovieMetadataId = x.MovieMetadata.Value.Id);
 
             return _movieService.AddMovies(moviesToAdd);

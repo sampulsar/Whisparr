@@ -14,7 +14,7 @@ namespace NzbDrone.Core.Movies.Performers
 {
     public interface IAddPerformerService
     {
-        Performer AddPerformer(Performer newPerformer);
+        Performer AddPerformer(Performer newPerformer, bool ignoreErrors = false);
         List<Performer> AddPerformers(List<Performer> newPerformers, bool ignoreErrors = false);
     }
 
@@ -33,7 +33,7 @@ namespace NzbDrone.Core.Movies.Performers
             _logger = logger;
         }
 
-        public Performer AddPerformer(Performer newPerformer)
+        public Performer AddPerformer(Performer newPerformer, bool ignoreErrors = false)
         {
             Ensure.That(newPerformer, () => newPerformer).IsNotNull();
 
@@ -48,6 +48,11 @@ namespace NzbDrone.Core.Movies.Performers
             }
             catch (Exception ex)
             {
+                if (!ignoreErrors)
+                {
+                    throw;
+                }
+
                 _logger.Debug("StashId {0} was not added due to Exception. {1}", newPerformer.ForeignId, ex.Message);
             }
 
