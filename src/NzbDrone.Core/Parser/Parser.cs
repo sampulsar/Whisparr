@@ -500,6 +500,35 @@ namespace NzbDrone.Core.Parser
             return ReplaceGermanUmlauts(NormalizeRegex.Replace(title, string.Empty).ToLower()).RemoveAccent();
         }
 
+        public static string CleanEpisodeTitle(this string title)
+        {
+            if (title.IsNullOrWhiteSpace())
+            {
+                return string.Empty;
+            }
+
+            var allRegexes = ReportTitleRegex.ToList();
+
+            foreach (var regex in allRegexes)
+            {
+                var match = regex.Matches(title);
+
+                if (match.Count != 0)
+                {
+                    var result = ParseMatchCollection(match, title);
+
+                    if (result != null)
+                    {
+                        var simpleReleaseTitle = SimpleReleaseTitleRegex.Replace(title, string.Empty);
+
+                        title = result.PrimaryMovieTitle;
+                    }
+                }
+            }
+
+            return title;
+        }
+
         public static string NormalizeEpisodeTitle(this string title)
         {
             title = SpecialEpisodeWordRegex.Replace(title, string.Empty);
@@ -769,14 +798,13 @@ namespace NzbDrone.Core.Parser
 
                 if (result.ReleaseTokens.IsNullOrWhiteSpace())
                 {
+                    var releaseTokens = releaseTitle;
                     if (lastSeasonEpisodeStringIndex != releaseTitle.Length)
                     {
-                        result.ReleaseTokens = releaseTitle.Substring(lastSeasonEpisodeStringIndex);
+                        releaseTokens = releaseTitle.Substring(lastSeasonEpisodeStringIndex);
                     }
-                    else
-                    {
-                        result.ReleaseTokens = releaseTitle;
-                    }
+
+                    result.ReleaseTokens = releaseTokens;
                 }
 
                 result.StudioTitle = studioTitle;

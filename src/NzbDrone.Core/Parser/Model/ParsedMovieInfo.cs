@@ -58,6 +58,11 @@ namespace NzbDrone.Core.Parser.Model
 
         public override string ToString()
         {
+            if (IsScene)
+            {
+                return string.Format("{0} - {1} {2}", StudioTitle, ReleaseDate, ReleaseTokens);
+            }
+
             return string.Format("{0} - {1} {2}", PrimaryMovieTitle, Year, Quality);
         }
     }

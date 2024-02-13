@@ -106,7 +106,9 @@ namespace NzbDrone.Core.Movies.Performers
 
                 if (moviesToAdd.Any())
                 {
-                    _addMovieService.AddMovies(moviesToAdd.Select(m => new Movie
+                    // Chunk the movies into smaller lists
+                    var chunkSize = 10;
+                    var movieLists = moviesToAdd.Select(m => new Movie
                     {
                         ForeignId = m,
                         QualityProfileId = performer.QualityProfileId,
@@ -118,7 +120,16 @@ namespace NzbDrone.Core.Movies.Performers
                         },
                         Monitored = true,
                         Tags = performer.Tags
-                    }).ToList(), true);
+                    }).ToList()
+                            .Select((x, i) => new { Index = i, Value = x })
+                            .GroupBy(x => x.Index / chunkSize)
+                            .Select(x => x.Select(v => v.Value).ToList())
+                            .ToList();
+
+                    foreach (var movieList in movieLists)
+                    {
+                        _addMovieService.AddMovies(movieList, true);
+                    }
                 }
             }
         }
