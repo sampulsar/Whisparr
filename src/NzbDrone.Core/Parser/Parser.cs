@@ -511,6 +511,11 @@ namespace NzbDrone.Core.Parser
 
             foreach (var regex in allRegexes)
             {
+                if (title.IsNullOrWhiteSpace())
+                {
+                    return string.Empty;
+                }
+
                 var match = regex.Matches(title);
 
                 if (match.Count != 0)
