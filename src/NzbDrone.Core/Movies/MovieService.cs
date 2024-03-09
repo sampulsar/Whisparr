@@ -59,6 +59,7 @@ namespace NzbDrone.Core.Movies
         private readonly IEventAggregator _eventAggregator;
         private readonly IBuildMoviePaths _moviePathBuilder;
         private readonly Logger _logger;
+        private readonly List<Movie> _allMovies = new List<Movie>();
 
         public MovieService(IMovieRepository movieRepository,
                             IEventAggregator eventAggregator,
@@ -71,6 +72,8 @@ namespace NzbDrone.Core.Movies
             _configService = configService;
             _moviePathBuilder = moviePathBuilder;
             _logger = logger;
+
+            _allMovies = _movieRepository.All().ToList();
         }
 
         public Movie GetMovie(int movieId)
@@ -94,6 +97,11 @@ namespace NzbDrone.Core.Movies
 
             _eventAggregator.PublishEvent(new MovieAddedEvent(GetMovie(movie.Id)));
 
+            if (!_allMovies.Contains(movie))
+            {
+                _allMovies.Remove(movie);
+            }
+
             return movie;
         }
 
@@ -102,6 +110,14 @@ namespace NzbDrone.Core.Movies
             _movieRepository.InsertMany(newMovies);
 
             _eventAggregator.PublishEvent(new MoviesImportedEvent(newMovies));
+
+            foreach (var newMovie in newMovies)
+            {
+                if (!_allMovies.Contains(newMovie))
+                {
+                    _allMovies.Remove(newMovie);
+                }
+            }
 
             return newMovies;
         }
@@ -217,6 +233,11 @@ namespace NzbDrone.Core.Movies
 
             _movieRepository.Delete(movieId);
             _eventAggregator.PublishEvent(new MoviesDeletedEvent(new List<Movie> { movie }, deleteFiles, addExclusion));
+            if (_allMovies.Contains(movie))
+            {
+                _allMovies.Remove(movie);
+            }
+
             _logger.Info("Deleted movie {0}", movie);
         }
 
@@ -230,13 +251,18 @@ namespace NzbDrone.Core.Movies
 
             foreach (var movie in moviesToDelete)
             {
+                if (_allMovies.Contains(movie))
+                {
+                    _allMovies.Remove(movie);
+                }
+
                 _logger.Info("Deleted movie {0}", movie);
             }
         }
 
         public List<Movie> GetAllMovies()
         {
-            return _movieRepository.All().ToList();
+            return _allMovies; // return _movieRepository.All().ToList();
         }
 
         public Dictionary<int, List<int>> AllMovieTags()
@@ -362,15 +388,20 @@ namespace NzbDrone.Core.Movies
         {
             var movies = _movieRepository.FindByStudioAndDate(studioForeignId, releaseDate);
 
+            if (movies.Count == 0)
+            {
+                return null;
+            }
+
             var parsedMovieTitle = Parser.Parser.NormalizeEpisodeTitle(releaseTokens);
-            var parsedAltTitle = Parser.Parser.NormalizeEpisodeTitle(Parser.Parser.CleanEpisodeTitle(releaseTokens));
 
             if (parsedMovieTitle.IsNotNullOrWhiteSpace())
             {
                 var matches = MatchMovies(parsedMovieTitle, movies);
-                if (matches.Count == 0)
+
+                if (matches.Count > 1)
                 {
-                    matches = MatchMovies(parsedAltTitle, movies);
+                    matches = MatchMovies(parsedMovieTitle, movies, true);
                 }
 
                 if (matches.Count == 1)
@@ -395,7 +426,7 @@ namespace NzbDrone.Core.Movies
             return null;
         }
 
-        private List<Movie> MatchMovies(string parsedMovieTitle, List<Movie> movies)
+        private List<Movie> MatchMovies(string parsedMovieTitle, List<Movie> movies, bool strict = false)
         {
             var matches = new List<Movie>();
 
@@ -435,6 +466,18 @@ namespace NzbDrone.Core.Movies
                 var cleanFemalePerformers = movie.MovieMetadata.Value.Credits.Where(a => a.Performer.Gender == Gender.Female)
                                                                              .Select(a => Parser.Parser.NormalizeEpisodeTitle(a.Performer.Name))
                                                                              .Where(x => x.IsNotNullOrWhiteSpace()).ToList();
+
+                // If all female performers are in title, consider a match
+                if (cleanFemalePerformers.Any() && cleanFemalePerformers.All(x => parsedMovieTitle.Equals(x + " " + cleanTitle)))
+                {
+                    matches.Add(movie);
+                    continue;
+                }
+
+                if (strict)
+                {
+                    continue;
+                }
 
                 // If all female performers are in title, consider a match
                 if (cleanFemalePerformers.Any() && cleanFemalePerformers.All(x => parsedMovieTitle.Contains(x)))

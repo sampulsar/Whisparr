@@ -282,14 +282,28 @@ namespace NzbDrone.Core.Parser
         {
             Movie movieInfo = null;
 
-            if (searchCriteria != null && searchCriteria.Movie.MovieMetadata.Value.ReleaseDate == airDate)
-            {
-                movieInfo = searchCriteria.Movie;
-            }
+            var movie = _movieService.FindByStudioAndReleaseDate(studio.ForeignId, airDate, part);
 
-            if (movieInfo == null)
+            if (movie != null && searchCriteria != null)
             {
-                movieInfo = _movieService.FindByStudioAndReleaseDate(studio.ForeignId, airDate, part);
+                if (movie.ForeignId != null && searchCriteria.Movie.ForeignId == movie.ForeignId)
+                {
+                    movieInfo = searchCriteria.Movie;
+                }
+
+                if (movie.TmdbId != 0 && searchCriteria.Movie.TmdbId == movie.TmdbId)
+                {
+                    movieInfo = searchCriteria.Movie;
+                }
+
+                if (movieInfo != null)
+                {
+                    return new FindMovieResult(movieInfo, MovieMatchType.Id);
+                }
+            }
+            else
+            {
+                movieInfo = movie;
             }
 
             return new FindMovieResult(movieInfo, MovieMatchType.Title);

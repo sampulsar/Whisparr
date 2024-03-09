@@ -144,6 +144,9 @@ namespace NzbDrone.Core.Parser
                                                                 string.Empty,
                                                                 RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
+        private static readonly Regex SpecialEpisodeTitleRegex = new Regex(@"(?<episodetitle>.+?)(?:\[.*(?:480p|720p|1080p|2160p|HDTV|WEB|WEBRip|WEB-?DL).*\]|(?:480p|720p|1080p|2160p)|XXX|$)",
+                          RegexOptions.Compiled);
+
         private static readonly Regex SimpleReleaseTitleRegex = new Regex(@"\s*(?:[<>?*:|])", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         // Valid TLDs http://data.iana.org/TLD/tlds-alpha-by-domain.txt
@@ -807,6 +810,13 @@ namespace NzbDrone.Core.Parser
                     if (lastSeasonEpisodeStringIndex != releaseTitle.Length)
                     {
                         releaseTokens = releaseTitle.Substring(lastSeasonEpisodeStringIndex);
+                    }
+
+                    var match = SpecialEpisodeTitleRegex.Match(releaseTokens);
+
+                    if (match != null && match.Groups["episodetitle"].Value.IsNotNullOrWhiteSpace())
+                    {
+                        releaseTokens = match.Groups["episodetitle"].Value;
                     }
 
                     result.ReleaseTokens = releaseTokens;
