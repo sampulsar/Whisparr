@@ -97,7 +97,7 @@ namespace NzbDrone.Core.Movies
 
             _eventAggregator.PublishEvent(new MovieAddedEvent(GetMovie(movie.Id)));
 
-            if (!_allMovies.Contains(movie))
+            if (_allMovies.Contains(movie))
             {
                 _allMovies.Remove(movie);
             }
@@ -115,7 +115,7 @@ namespace NzbDrone.Core.Movies
             {
                 if (!_allMovies.Contains(newMovie))
                 {
-                    _allMovies.Remove(newMovie);
+                    _allMovies.Add(newMovie);
                 }
             }
 
@@ -262,7 +262,7 @@ namespace NzbDrone.Core.Movies
 
         public List<Movie> GetAllMovies()
         {
-            return _allMovies; // return _movieRepository.All().ToList();
+            return _allMovies;
         }
 
         public Dictionary<int, List<int>> AllMovieTags()
