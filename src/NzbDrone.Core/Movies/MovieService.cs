@@ -388,7 +388,7 @@ namespace NzbDrone.Core.Movies
         {
             var movies = _movieRepository.FindByStudioAndDate(studioForeignId, releaseDate);
 
-            if (movies.Count == 0)
+            if (!movies.Any())
             {
                 return null;
             }
