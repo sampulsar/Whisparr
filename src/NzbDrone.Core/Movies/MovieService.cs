@@ -97,7 +97,7 @@ namespace NzbDrone.Core.Movies
 
             _eventAggregator.PublishEvent(new MovieAddedEvent(GetMovie(movie.Id)));
 
-            if (!_allMovies.Where(x => x.Id == newMovie.Id).Any())
+            if (!_allMovies.Where(x => x.Id == movie.Id).Any())
             {
                 _allMovies.Add(newMovie);
             }
@@ -275,6 +275,13 @@ namespace NzbDrone.Core.Movies
             var storedMovie = GetMovie(movie.Id);
 
             var updatedMovie = _movieRepository.Update(movie);
+
+            var index = _allMovies.FindIndex(x => x.Id == updatedMovie.Id);
+            if (index != -1)
+            {
+                _allMovies[index] = updatedMovie;
+            }
+
             _eventAggregator.PublishEvent(new MovieEditedEvent(updatedMovie, storedMovie));
 
             return updatedMovie;
@@ -296,6 +303,12 @@ namespace NzbDrone.Core.Movies
                 else
                 {
                     _logger.Trace("Not changing path for: {0}", m.Title);
+                }
+
+                var index = _allMovies.FindIndex(x => x.Id == m.Id);
+                if (index != -1)
+                {
+                    _allMovies[index] = m;
                 }
             }
 
