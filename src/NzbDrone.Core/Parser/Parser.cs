@@ -41,7 +41,7 @@ namespace NzbDrone.Core.Parser
             new Regex(@"^(?<studiotitle>.+?)?[-_. ]+(?<airyear>(19|20)\d{2})(?<airmonth>[0-1][0-9])(?<airday>[0-3][0-9])",
                 RegexOptions.IgnoreCase | RegexOptions.Compiled),
 
-            // SCENE with non-separated airdate after title studio - title (dd.mm.yyyy)
+            // SCENE with airdate after title studio - title (dd.mm.yyyy)
             new Regex(@"^(?<studiotitle>.+?)?[-_. ]+(?<releasetoken>.+?)\((?<airday>[0-3][0-9])\.(?<airmonth>[0-1][0-9])\.(?<airyear>(19|20)\d{2})",
                 RegexOptions.IgnoreCase | RegexOptions.Compiled),
 
@@ -543,6 +543,7 @@ namespace NzbDrone.Core.Parser
 
         public static string NormalizeEpisodeTitle(this string title)
         {
+            title = title.Replace(" & ", " and ");
             title = SpecialEpisodeWordRegex.Replace(title, string.Empty);
             title = PunctuationRegex.Replace(title, " ");
             title = DuplicateSpacesRegex.Replace(title, " ");

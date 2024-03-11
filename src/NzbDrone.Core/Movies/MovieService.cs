@@ -97,9 +97,9 @@ namespace NzbDrone.Core.Movies
 
             _eventAggregator.PublishEvent(new MovieAddedEvent(GetMovie(movie.Id)));
 
-            if (_allMovies.Contains(movie))
+            if (!_allMovies.Where(x => x.Id == newMovie.Id).Any())
             {
-                _allMovies.Remove(movie);
+                _allMovies.Add(newMovie);
             }
 
             return movie;
@@ -113,7 +113,7 @@ namespace NzbDrone.Core.Movies
 
             foreach (var newMovie in newMovies)
             {
-                if (!_allMovies.Contains(newMovie))
+                if (!_allMovies.Where(x => x.Id == newMovie.Id).Any())
                 {
                     _allMovies.Add(newMovie);
                 }
@@ -233,7 +233,7 @@ namespace NzbDrone.Core.Movies
 
             _movieRepository.Delete(movieId);
             _eventAggregator.PublishEvent(new MoviesDeletedEvent(new List<Movie> { movie }, deleteFiles, addExclusion));
-            if (_allMovies.Contains(movie))
+            if (_allMovies.Where(x => x.Id == movieId).Any())
             {
                 _allMovies.Remove(movie);
             }
@@ -251,7 +251,7 @@ namespace NzbDrone.Core.Movies
 
             foreach (var movie in moviesToDelete)
             {
-                if (_allMovies.Contains(movie))
+                if (_allMovies.Where(x => x.Id == movie.Id).Any())
                 {
                     _allMovies.Remove(movie);
                 }
