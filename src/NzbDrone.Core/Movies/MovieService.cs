@@ -229,14 +229,16 @@ namespace NzbDrone.Core.Movies
 
         public void DeleteMovie(int movieId, bool deleteFiles, bool addExclusion = false)
         {
+            var index = _allMovies.FindIndex(x => x.Id == movieId);
+            if (index != -1)
+            {
+                _allMovies.RemoveRange(index, 1);
+            }
+
             var movie = _movieRepository.Get(movieId);
 
             _movieRepository.Delete(movieId);
             _eventAggregator.PublishEvent(new MoviesDeletedEvent(new List<Movie> { movie }, deleteFiles, addExclusion));
-            if (_allMovies.Where(x => x.Id == movieId).Any())
-            {
-                _allMovies.Remove(movie);
-            }
 
             _logger.Info("Deleted movie {0}", movie);
         }
@@ -251,9 +253,10 @@ namespace NzbDrone.Core.Movies
 
             foreach (var movie in moviesToDelete)
             {
-                if (_allMovies.Where(x => x.Id == movie.Id).Any())
+                var index = _allMovies.FindIndex(x => x.Id == movie.Id);
+                if (index != -1)
                 {
-                    _allMovies.Remove(movie);
+                    _allMovies.RemoveRange(index, 1);
                 }
 
                 _logger.Info("Deleted movie {0}", movie);
@@ -426,7 +429,7 @@ namespace NzbDrone.Core.Movies
                 {
                     // Check for duplicate data in StashDB
 
-                    if (matches.First().Path == matches.Last().Path)
+                    if (Parser.Parser.NormalizeEpisodeTitle(matches.First().Title) == Parser.Parser.NormalizeEpisodeTitle(matches.Last().Title))
                     {
                         return matches.First();
                     }
