@@ -812,6 +812,14 @@ namespace NzbDrone.Core.Parser
                 if (result.ReleaseTokens.IsNullOrWhiteSpace())
                 {
                     var releaseTokens = releaseTitle;
+                    var matchstart = releaseTitle.IndexOf(matchCollection[0].Value);
+                    if (studioTitle.IsNullOrWhiteSpace() && matchstart > 0)
+                    {
+                        studioTitle = releaseTitle.Substring(0, matchstart);
+                        lastSeasonEpisodeStringIndex += matchstart;
+                        studioTitle = RequestInfoRegex.Replace(studioTitle, "").Trim(' ');
+                    }
+
                     if (lastSeasonEpisodeStringIndex != releaseTitle.Length)
                     {
                         releaseTokens = releaseTitle.Substring(lastSeasonEpisodeStringIndex);
@@ -819,7 +827,7 @@ namespace NzbDrone.Core.Parser
 
                     var match = SpecialEpisodeTitleRegex.Match(releaseTokens);
 
-                    if (match != null && match.Groups["episodetitle"].Value.IsNotNullOrWhiteSpace())
+                    if (match != null && match.Groups["episodetitle"].Value.IsNotNullOrWhiteSpace() && match.Groups["episodetitle"].Value.Length > 3)
                     {
                         releaseTokens = match.Groups["episodetitle"].Value;
                     }
