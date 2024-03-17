@@ -29,9 +29,11 @@ interface Movie extends ModelBase {
   monitored: boolean;
   status: string;
   title: string;
+  credits: Array<object>;
   titleSlug: string;
   collection: Collection;
   studioTitle: string;
+  studioForeignId: string;
   qualityProfileId: number;
   added: string;
   year: number;

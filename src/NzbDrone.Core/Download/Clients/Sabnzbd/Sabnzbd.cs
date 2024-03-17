@@ -10,7 +10,6 @@ using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Http;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Exceptions;
-using NzbDrone.Core.Organizer;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.RemotePathMappings;
 using NzbDrone.Core.Validation;
@@ -24,12 +23,11 @@ namespace NzbDrone.Core.Download.Clients.Sabnzbd
         public Sabnzbd(ISabnzbdProxy proxy,
                        IHttpClient httpClient,
                        IConfigService configService,
-                       INamingConfigService namingConfigService,
                        IDiskProvider diskProvider,
                        IRemotePathMappingService remotePathMappingService,
                        IValidateNzbs nzbValidationService,
                        Logger logger)
-            : base(httpClient, configService, namingConfigService, diskProvider, remotePathMappingService, nzbValidationService, logger)
+            : base(httpClient, configService, diskProvider, remotePathMappingService, nzbValidationService, logger)
         {
             _proxy = proxy;
         }
@@ -482,6 +480,16 @@ namespace NzbDrone.Core.Download.Clients.Sabnzbd
                         DetailedDescription = "The category you entered doesn't exist in SABnzbd. Go to SABnzbd to create it."
                     };
                 }
+            }
+
+            // New in SABnzbd 4.1, but on older versions this will be empty and not apply
+            if (config.Sorters.Any(s => s.is_active && ContainsCategory(s.sort_cats, Settings.MovieCategory)))
+            {
+                return new NzbDroneValidationFailure("MovieCategory", "Disable TV Sorting")
+                {
+                    InfoLink = _proxy.GetBaseUrl(Settings, "config/sorting/"),
+                    DetailedDescription = "You must disable sorting for the category Radarr uses to prevent import issues. Go to Sabnzbd to fix it."
+                };
             }
 
             if (config.Misc.enable_tv_sorting && ContainsCategory(config.Misc.tv_categories, Settings.MovieCategory))

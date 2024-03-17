@@ -41,12 +41,15 @@ import MovieCastPostersConnector from './Credits/Cast/MovieCastPostersConnector'
 import MovieDetailsLinks from './MovieDetailsLinks';
 import MovieReleaseDates from './MovieReleaseDates';
 import MovieStatusLabel from './MovieStatusLabel';
+import MovieStudioLink from './MovieStudioLink';
 import MovieTagsConnector from './MovieTagsConnector';
 import styles from './MovieDetails.css';
 
 const defaultFontSize = parseInt(fonts.defaultFontSize);
 const lineHeight = parseFloat(fonts.lineHeight);
-
+const screenshotStyle = {
+  'object-fit': 'cover'
+};
 function getFanartUrl(images) {
   return _.find(images, { coverType: 'fanart' })?.url;
 }
@@ -236,6 +239,7 @@ class MovieDetails extends Component {
       qualityProfileId,
       monitored,
       studioTitle,
+      studioForeignId,
       genres,
       overview,
       isAvailable,
@@ -314,8 +318,8 @@ class MovieDetails extends Component {
             />
 
             <PageToolbarButton
-              label={translate('ManualImport')}
-              iconName={icons.INTERACTIVE}
+              label={translate('ManageFiles')}
+              iconName={icons.MOVIE_FILE}
               onPress={this.onInteractiveImportPress}
             />
 
@@ -355,7 +359,7 @@ class MovieDetails extends Component {
             </div>
 
             <div className={styles.headerContent}>
-              <ImageComponent
+              <ImageComponent style={screenshotStyle}
                 blur={safeForWorkMode}
                 className={itemType === 'movie' ? styles.poster : styles.screenShot}
                 images={images}
@@ -404,43 +408,39 @@ class MovieDetails extends Component {
 
                 <div className={styles.details}>
                   <div>
-                    {
-                      !!certification &&
-                        <span className={styles.certification}>
-                          {certification}
-                        </span>
+                    {!!certification &&
+                      <span className={styles.certification}>
+                        {certification}
+                      </span>
                     }
 
-                    {
-                      year > 0 &&
-                        <span className={styles.year}>
-                          <Popover
-                            anchor={
-                              year
-                            }
-                            title={translate('ReleaseDates')}
-                            body={
-                              <MovieReleaseDates
-                                releaseDate={releaseDate}
-                              />
-                            }
-                            position={tooltipPositions.BOTTOM}
-                          />
-                        </span>
+                    {year > 0 &&
+                      <span className={styles.year}>
+                        <Popover
+                          anchor={
+                            year
+                          }
+                          title={translate('ReleaseDates')}
+                          body={
+                            <MovieReleaseDates
+                              releaseDate={releaseDate}
+                            />
+                          }
+                          position={tooltipPositions.BOTTOM}
+                        />
+                      </span>
                     }
 
-                    {
-                      !!studioTitle &&
-                        <span className={styles.studio}>
-                          {studioTitle}
-                        </span>
+                    {!!studioTitle &&
+                      <span className={styles.studio}>
+                        <MovieStudioLink foreignId={studioForeignId} studioTitle={studioTitle} />
+                      </span>
                     }
 
-                    {
-                      !!runtime &&
-                        <span className={styles.runtime}>
-                          {formatRuntime(runtime, movieRuntimeFormat)}
-                        </span>
+                    {!!runtime &&
+                      <span className={styles.runtime}>
+                        {formatRuntime(runtime, movieRuntimeFormat)}
+                      </span>
                     }
 
                     {
@@ -463,44 +463,41 @@ class MovieDetails extends Component {
                       </span>
                     }
 
-                    {
-                      !!tags.length &&
-                        <span>
-                          <Tooltip
-                            anchor={
-                              <Icon
-                                name={icons.TAGS}
-                                size={20}
-                              />
-                            }
-                            tooltip={
-                              <MovieTagsConnector movieId={id} />
-                            }
-                            position={tooltipPositions.BOTTOM}
-                          />
-                        </span>
+                    {!!tags.length &&
+                      <span>
+                        <Tooltip
+                          anchor={
+                            <Icon
+                              name={icons.TAGS}
+                              size={20}
+                            />
+                          }
+                          tooltip={
+                            <MovieTagsConnector movieId={id} />
+                          }
+                          position={tooltipPositions.BOTTOM}
+                        />
+                      </span>
                     }
                   </div>
                 </div>
 
                 <div className={styles.details}>
-                  {
-                    !!ratings.tmdb &&
-                      <span className={styles.rating}>
-                        <TmdbRating
-                          ratings={ratings}
-                          iconSize={20}
-                        />
-                      </span>
+                  {!!ratings.tmdb &&
+                    <span className={styles.rating}>
+                      <TmdbRating
+                        ratings={ratings}
+                        iconSize={20}
+                      />
+                    </span>
                   }
-                  {
-                    !!ratings.rottenTomatoes &&
-                      <span className={styles.rating}>
-                        <RottenTomatoRating
-                          ratings={ratings}
-                          iconSize={20}
-                        />
-                      </span>
+                  {!!ratings.rottenTomatoes &&
+                    <span className={styles.rating}>
+                      <RottenTomatoRating
+                        ratings={ratings}
+                        iconSize={20}
+                      />
+                    </span>
                   }
                 </div>
 
@@ -557,17 +554,16 @@ class MovieDetails extends Component {
                     </span>
                   </InfoLabel>
 
-                  {
-                    !!genres.length && !isSmallScreen &&
-                      <InfoLabel
-                        className={styles.detailsInfoLabel}
-                        title={translate('Genres')}
-                        size={sizes.LARGE}
-                      >
-                        <span className={styles.genres}>
-                          {genres.slice(0, 3).join(', ')}
-                        </span>
-                      </InfoLabel>
+                  {!!genres.length && !isSmallScreen &&
+                    <InfoLabel
+                      className={styles.detailsInfoLabel}
+                      title={translate('Genres')}
+                      size={sizes.LARGE}
+                    >
+                      <span className={styles.genres}>
+                        {genres.slice(0, 3).join(', ')}
+                      </span>
+                    </InfoLabel>
                   }
                 </div>
 
@@ -647,6 +643,7 @@ class MovieDetails extends Component {
           <InteractiveImportModal
             isOpen={isInteractiveImportModalOpen}
             movieId={id}
+            modalTitle={translate('ManageFiles')}
             folder={path}
             allowMovieChange={false}
             showFilterExistingFiles={true}
@@ -680,6 +677,7 @@ MovieDetails.propTypes = {
   monitored: PropTypes.bool.isRequired,
   status: PropTypes.string.isRequired,
   studioTitle: PropTypes.string,
+  studioForeignId: PropTypes.string,
   genres: PropTypes.arrayOf(PropTypes.string).isRequired,
   collection: PropTypes.object,
   isAvailable: PropTypes.bool.isRequired,
