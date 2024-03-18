@@ -74,21 +74,6 @@ namespace NzbDrone.Core.Movies
 
                 try
                 {
-                    if (m.ForeignId.IsNotNullOrWhiteSpace())
-                    {
-                        if (existingMovieForeignIds.Any(f => f == m.ForeignId))
-                        {
-                            _logger.Debug("Foreign ID {0} was not added due to validation failure: Movie already exists in database", m.ForeignId);
-                            continue;
-                        }
-
-                        if (moviesToAdd.Any(f => f.ForeignId == m.ForeignId))
-                        {
-                            _logger.Debug("Foreign ID {0} was not added due to validation failure: Movie already exists on list", m.ForeignId);
-                            continue;
-                        }
-                    }
-
                     var movie = AddSkyhookData(m);
                     movie = SetPropertiesAndValidate(movie);
 
@@ -115,7 +100,7 @@ namespace NzbDrone.Core.Movies
                         throw;
                     }
 
-                    _logger.Debug("TmdbId {0} was not added due to validation failures. {1}", m.ForeignId, ex.Message);
+                    _logger.Debug("Foreign ID {0} was not added due to validation failures. {1}", m.ForeignId, ex.Message);
                 }
                 catch (HttpException ex)
                 {
@@ -124,7 +109,7 @@ namespace NzbDrone.Core.Movies
                         throw;
                     }
 
-                    _logger.Debug("TmdbId {0} was not added due to connection failures. {1}", m.ForeignId, ex.Message);
+                    _logger.Debug("Foreign ID {0} was not added due to connection failures. {1}", m.ForeignId, ex.Message);
                 }
                 catch (Exception ex)
                 {
@@ -133,7 +118,7 @@ namespace NzbDrone.Core.Movies
                         throw;
                     }
 
-                    _logger.Debug("TmdbId {0} was not added due to failures. {1}", m.ForeignId, ex.Message);
+                    _logger.Debug("Foreign ID {0} was not added due to failures. {1}", m.ForeignId, ex.Message);
                 }
             }
 

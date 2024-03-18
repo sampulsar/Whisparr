@@ -504,6 +504,8 @@ namespace NzbDrone.Core.Parser
                 return title;
             }
 
+            title = title.Replace(" ", "");
+
             return ReplaceGermanUmlauts(NormalizeRegex.Replace(title, string.Empty).ToLower()).RemoveAccent();
         }
 
