@@ -60,7 +60,6 @@ namespace NzbDrone.Core.Movies
         private readonly IEventAggregator _eventAggregator;
         private readonly IBuildMoviePaths _moviePathBuilder;
         private readonly Logger _logger;
-        private readonly List<Movie> _allMovies = new List<Movie>();
 
         public MovieService(IMovieRepository movieRepository,
                             IEventAggregator eventAggregator,
@@ -73,8 +72,6 @@ namespace NzbDrone.Core.Movies
             _configService = configService;
             _moviePathBuilder = moviePathBuilder;
             _logger = logger;
-
-            _allMovies = _movieRepository.All().ToList();
         }
 
         public Movie GetMovie(int movieId)
@@ -98,11 +95,6 @@ namespace NzbDrone.Core.Movies
 
             _eventAggregator.PublishEvent(new MovieAddedEvent(GetMovie(movie.Id)));
 
-            if (!_allMovies.Where(x => x.Id == movie.Id).Any())
-            {
-                _allMovies.Add(newMovie);
-            }
-
             return movie;
         }
 
@@ -111,14 +103,6 @@ namespace NzbDrone.Core.Movies
             _movieRepository.InsertMany(newMovies);
 
             _eventAggregator.PublishEvent(new MoviesImportedEvent(newMovies));
-
-            foreach (var newMovie in newMovies)
-            {
-                if (!_allMovies.Where(x => x.Id == newMovie.Id).Any())
-                {
-                    _allMovies.Add(newMovie);
-                }
-            }
 
             return newMovies;
         }
@@ -230,12 +214,6 @@ namespace NzbDrone.Core.Movies
 
         public void DeleteMovie(int movieId, bool deleteFiles, bool addExclusion = false)
         {
-            var index = _allMovies.FindIndex(x => x.Id == movieId);
-            if (index != -1)
-            {
-                _allMovies.RemoveRange(index, 1);
-            }
-
             var movie = _movieRepository.Get(movieId);
 
             _movieRepository.Delete(movieId);
@@ -254,19 +232,13 @@ namespace NzbDrone.Core.Movies
 
             foreach (var movie in moviesToDelete)
             {
-                var index = _allMovies.FindIndex(x => x.Id == movie.Id);
-                if (index != -1)
-                {
-                    _allMovies.RemoveRange(index, 1);
-                }
-
                 _logger.Info("Deleted movie {0}", movie);
             }
         }
 
         public List<Movie> GetAllMovies()
         {
-            return _allMovies;
+            return _movieRepository.All().ToList();
         }
 
         public Dictionary<int, List<int>> AllMovieTags()
@@ -279,12 +251,6 @@ namespace NzbDrone.Core.Movies
             var storedMovie = GetMovie(movie.Id);
 
             var updatedMovie = _movieRepository.Update(movie);
-
-            var index = _allMovies.FindIndex(x => x.Id == updatedMovie.Id);
-            if (index != -1)
-            {
-                _allMovies[index] = updatedMovie;
-            }
 
             _eventAggregator.PublishEvent(new MovieEditedEvent(updatedMovie, storedMovie));
 
@@ -307,12 +273,6 @@ namespace NzbDrone.Core.Movies
                 else
                 {
                     _logger.Trace("Not changing path for: {0}", m.Title);
-                }
-
-                var index = _allMovies.FindIndex(x => x.Id == m.Id);
-                if (index != -1)
-                {
-                    _allMovies[index] = m;
                 }
             }
 
