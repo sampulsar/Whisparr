@@ -5,7 +5,6 @@ using FluentValidation;
 using FluentValidation.Results;
 using NLog;
 using NzbDrone.Common.EnsureThat;
-using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Exceptions;
 using NzbDrone.Core.MetadataSource;
 using NzbDrone.Core.Parser;
