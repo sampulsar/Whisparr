@@ -525,6 +525,32 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
             {
                 var searchTerm = lowerTitle.Replace("_", " ").Replace(".", " ");
 
+                var parsedMovieInfo = Parser.Parser.ParseMovieTitle(lowerTitle);
+
+                if (parsedMovieInfo != null && parsedMovieInfo.ReleaseTokens.IsNotNullOrWhiteSpace() && parsedMovieInfo.ReleaseTitle != parsedMovieInfo.ReleaseTokens)
+                {
+                    var cleanReleaseToken = Parser.Parser.CleanEpisodeTitle(parsedMovieInfo.ReleaseTokens).Replace("'", "").Replace("-", "").Replace(".", "");
+                    searchTerm = searchTerm.Replace(parsedMovieInfo.ReleaseTokens, cleanReleaseToken);
+
+                    searchTerm = cleanReleaseToken;
+                }
+                else if (parsedMovieInfo != null && parsedMovieInfo.ReleaseDate.IsNotNullOrWhiteSpace())
+                {
+                    var cleanReleaseToken = Parser.Parser.CleanEpisodeTitle(searchTerm).Replace("'", "").Replace(".", "");
+                    if (cleanReleaseToken.IsNotNullOrWhiteSpace())
+                    {
+                        searchTerm = cleanReleaseToken;
+                    }
+                }
+                else
+                {
+                    var cleanReleaseToken = Parser.Parser.CleanEpisodeTitle(searchTerm).Replace("'", "").Replace("-", "").Replace(".", "");
+                    if (cleanReleaseToken.IsNotNullOrWhiteSpace())
+                    {
+                        searchTerm = cleanReleaseToken;
+                    }
+                }
+
                 var route = itemType == ItemType.Movie ? "movie/search" : "scene/search";
 
                 var request = _whisparrMetadata.Create()

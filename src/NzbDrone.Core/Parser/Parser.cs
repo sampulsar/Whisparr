@@ -148,7 +148,7 @@ namespace NzbDrone.Core.Parser
                                                                 string.Empty,
                                                                 RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        private static readonly Regex SpecialEpisodeTitleRegex = new Regex(@"(?<episodetitle>.+?)(?:\[.*(?:480p|720p|1080p|2160p|HDTV|WEB|WEBRip|WEB-?DL).*\]|(?:480p|720p|1080p|2160p)|XXX|$)",
+        private static readonly Regex SpecialEpisodeTitleRegex = new Regex(@"(?<episodetitle>.+?)(?:\[.*(?:480p|720p|1080p|2160p|HDTV|WEB|WEBRip|WEB-?DL).*\]|\.XXX\.(?:480p|720p|1080p|2160p|HDTV|WEB|WEBRip|WEB-?DL).*|(?:480p|720p|1080p|2160p|HDTV|WEB|WEBRip|WEB-?DL)|$)",
                           RegexOptions.Compiled);
 
         private static readonly Regex SimpleReleaseTitleRegex = new Regex(@"\s*(?:[<>?*:|])", RegexOptions.Compiled | RegexOptions.IgnoreCase);
@@ -829,7 +829,7 @@ namespace NzbDrone.Core.Parser
 
                     var match = SpecialEpisodeTitleRegex.Match(releaseTokens);
 
-                    if (match != null && match.Groups["episodetitle"].Value.IsNotNullOrWhiteSpace() && match.Groups["episodetitle"].Value.Length > 3)
+                    if (match != null && match.Groups["episodetitle"].Value.IsNotNullOrWhiteSpace())
                     {
                         releaseTokens = match.Groups["episodetitle"].Value;
                     }

@@ -130,6 +130,19 @@ namespace Whisparr.Api.V3.Movies
                 }
 
                 var movies = movieTask.GetAwaiter().GetResult();
+#if DEBUG
+
+                // Limit the data as the client can not process it all
+                var limit = 100000;
+                movies = movies.OrderBy(x => x.Id).Reverse().ToList();
+
+                    // movies = movies.Where(x => x.Monitored == false).ToList();
+
+                if (movies.Count > limit)
+                {
+                    movies = movies.GetRange(0, limit);
+                }
+#endif
 
                 moviesResources = new List<MovieResource>(movies.Count);
 

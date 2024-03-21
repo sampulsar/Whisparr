@@ -15,6 +15,7 @@ using NzbDrone.Core.MediaFiles.MovieImport.Aggregation;
 using NzbDrone.Core.Messaging.Commands;
 using NzbDrone.Core.Messaging.Events;
 using NzbDrone.Core.Movies;
+using NzbDrone.Core.Movies.Studios;
 using NzbDrone.Core.Parser;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.Qualities;
@@ -40,6 +41,7 @@ namespace NzbDrone.Core.MediaFiles.MovieImport.Manual
         private readonly IDownloadedMovieImportService _downloadedMovieImportService;
         private readonly ICustomFormatCalculationService _formatCalculator;
         private readonly IEventAggregator _eventAggregator;
+        private readonly IStudioService _studioService;
         private readonly Logger _logger;
 
         public ManualImportService(IDiskProvider diskProvider,
@@ -53,6 +55,7 @@ namespace NzbDrone.Core.MediaFiles.MovieImport.Manual
                                    IDownloadedMovieImportService downloadedMovieImportService,
                                    ICustomFormatCalculationService formatCalculator,
                                    IEventAggregator eventAggregator,
+                                   IStudioService studioService,
                                    Logger logger)
         {
             _diskProvider = diskProvider;
@@ -66,6 +69,7 @@ namespace NzbDrone.Core.MediaFiles.MovieImport.Manual
             _downloadedMovieImportService = downloadedMovieImportService;
             _formatCalculator = formatCalculator;
             _eventAggregator = eventAggregator;
+            _studioService = studioService;
             _logger = logger;
         }
 
@@ -145,7 +149,20 @@ namespace NzbDrone.Core.MediaFiles.MovieImport.Manual
             {
                 try
                 {
-                    movie = _parsingService.GetMovie(directoryInfo.Name);
+                    var hasSubfolders = _diskScanService.FilterPaths(rootFolder, _diskProvider.GetDirectories(baseFolder)).Any();
+                    if (!hasSubfolders)
+                    {
+                        movie = _parsingService.GetMovie(directoryInfo.Name);
+                        if (movie != null)
+                        {
+                            // Check if the folder was a studio
+                            var isStudioName = _studioService.FindAllByTitle(directoryInfo.Name).Any();
+                            if (isStudioName)
+                            {
+                                movie = null;
+                            }
+                        }
+                    }
                 }
                 catch (MultipleMoviesFoundException e)
                 {
@@ -172,7 +189,7 @@ namespace NzbDrone.Core.MediaFiles.MovieImport.Manual
                 // If the movie is unknown for the directory and there are more than 100 files in the folder don't process the items before returning.
                 var files = _diskScanService.FilterPaths(rootFolder, _diskScanService.GetVideoFiles(baseFolder, false));
 
-                if (files.Count > 100)
+                if (files.Count > 10000)
                 {
                     _logger.Warn("Unable to determine movie from folder name and found more than 100 files. Skipping parsing");
 
