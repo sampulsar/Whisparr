@@ -445,21 +445,14 @@ namespace NzbDrone.Core.Movies
                     continue;
                 }
 
-                var cleanFemalePerformers = movie.MovieMetadata.Value.Credits.Where(a => a.Performer.Gender == Gender.Female)
-                                                                             .Select(a => Parser.Parser.NormalizeEpisodeTitle(a.Performer.Name))
-                                                                             .Where(x => x.IsNotNullOrWhiteSpace()).ToList();
-
-                // If all female performers are in title, consider a match
-                if (cleanFemalePerformers.Any() && cleanFemalePerformers.All(x => parsedMovieTitle.Equals(x + " " + cleanTitle)))
-                {
-                    matches.Add(movie);
-                    continue;
-                }
-
                 if (strict)
                 {
                     continue;
                 }
+
+                var cleanFemalePerformers = movie.MovieMetadata.Value.Credits.Where(a => a.Performer.Gender == Gender.Female)
+                                                                             .Select(a => Parser.Parser.NormalizeEpisodeTitle(a.Performer.Name))
+                                                                             .Where(x => x.IsNotNullOrWhiteSpace()).ToList();
 
                 // If all female performers are in title, consider a match
                 if (cleanFemalePerformers.Any() && cleanFemalePerformers.All(x => parsedMovieTitle.Contains(x)))
