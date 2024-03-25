@@ -151,7 +151,7 @@ namespace NzbDrone.Core.Parser
         private static readonly Regex SpecialEpisodeTitleRegex = new Regex(@"(?<episodetitle>.+?)(?:\[.*(?:480p|720p|1080p|2160p|HDTV|WEB|WEBRip|WEB-?DL).*\]|\.XXX\.(?:480p|720p|1080p|2160p|HDTV|WEB|WEBRip|WEB-?DL).*|(?:480p|720p|1080p|2160p|HDTV|WEB|WEBRip|WEB-?DL)|$)",
                           RegexOptions.Compiled);
 
-        private static readonly Regex SimpleReleaseTitleRegex = new Regex(@"\s*(?:[<>?*:|])", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex SimpleReleaseTitleRegex = new Regex(@"\s*(?:[<>?*|])", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         // Valid TLDs http://data.iana.org/TLD/tlds-alpha-by-domain.txt
         private static readonly RegexReplace WebsitePrefixRegex = new RegexReplace(@"^(?:\[\s*)?(?:www\.)?[-a-z0-9-]{1,256}\.(?:[a-z]{2,6}\.[a-z]{2,6}|xn--[a-z0-9-]{4,}|[a-z]{2,})\b(?:\s*\]|[ -]{2,})[ -]*",
