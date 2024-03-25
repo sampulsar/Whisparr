@@ -131,13 +131,14 @@ namespace Whisparr.Api.V3.Movies
 
                 var movies = movieTask.GetAwaiter().GetResult();
 #if DEBUG
+                // movies = movies.OrderBy(x => x.Id).Reverse().ToList();
+
+                // movies = movies.Where(x => x.Monitored == false).ToList();
+
+                movies = movies.Where(x => x.MovieMetadata.Value.ReleaseDateUtc > DateTime.UtcNow.AddYears(-5)).ToList();
 
                 // Limit the data as the client can not process it all
                 var limit = 100000;
-                movies = movies.OrderBy(x => x.Id).Reverse().ToList();
-
-                    // movies = movies.Where(x => x.Monitored == false).ToList();
-
                 if (movies.Count > limit)
                 {
                     movies = movies.GetRange(0, limit);

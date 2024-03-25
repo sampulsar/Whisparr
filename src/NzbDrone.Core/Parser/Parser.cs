@@ -42,6 +42,10 @@ namespace NzbDrone.Core.Parser
                 RegexOptions.IgnoreCase | RegexOptions.Compiled),
 
             // SCENE with airdate after title studio - title (dd.mm.yyyy)
+            new Regex(@"\\[(?<studiotitle>.+?)\\]?[-_. ]+(?<releasetoken>.+?)\((?<airday>[0-3][0-9])\.(?<airmonth>[0-1][0-9])\.(?<airyear>(19|20)\d{2})",
+                RegexOptions.IgnoreCase | RegexOptions.Compiled),
+
+            // SCENE with airdate after title studio - title (dd.mm.yyyy)
             new Regex(@"^(?<studiotitle>.+?)?[-_. ]+(?<releasetoken>.+?)\((?<airday>[0-3][0-9])\.(?<airmonth>[0-1][0-9])\.(?<airyear>(19|20)\d{2})",
                 RegexOptions.IgnoreCase | RegexOptions.Compiled),
 
@@ -270,6 +274,8 @@ namespace NzbDrone.Core.Parser
 
                 var simpleTitle = SimpleTitleRegex.Replace(releaseTitle);
 
+                simpleTitle = simpleTitle.Replace(".com]", "]");
+
                 // TODO: Quick fix stripping [url] - prefixes.
                 simpleTitle = WebsitePrefixRegex.Replace(simpleTitle);
                 simpleTitle = WebsitePostfixRegex.Replace(simpleTitle);
@@ -489,6 +495,11 @@ namespace NzbDrone.Core.Parser
             }
 
             return value;
+        }
+
+        public static string CleanStudioTitle(this string title)
+        {
+            return title.Replace(" ", "").CleanMovieTitle();
         }
 
         public static string CleanMovieTitle(this string title)
@@ -752,6 +763,7 @@ namespace NzbDrone.Core.Parser
                 int.TryParse(matchCollection[0].Groups["airyear"].Value, out var airYear);
 
                 var studioTitle = matchCollection[0].Groups["studiotitle"].Value.Replace('.', ' ').Replace('_', ' ');
+                studioTitle = studioTitle.Trim('[').Trim(']');
                 studioTitle = RequestInfoRegex.Replace(studioTitle, "").Trim(' ');
 
                 var lastSeasonEpisodeStringIndex = matchCollection[0].Groups["studiotitle"].EndIndex();
