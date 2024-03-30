@@ -130,21 +130,6 @@ namespace Whisparr.Api.V3.Movies
                 }
 
                 var movies = movieTask.GetAwaiter().GetResult();
-#if DEBUG
-                // movies = movies.OrderBy(x => x.Id).Reverse().ToList();
-
-                movies = (from m in movies
-                          orderby m.Monitored, m.MovieMetadata.Value.ReleaseDateUtc descending
-                          select m).ToList();
-
-                // Limit the data as the client can not process it all
-                var limit = 100000;
-                if (movies.Count > limit)
-                {
-                    movies = movies.GetRange(0, limit);
-                }
-#endif
-
                 moviesResources = new List<MovieResource>(movies.Count);
 
                 foreach (var movie in movies)
@@ -169,6 +154,32 @@ namespace Whisparr.Api.V3.Movies
         {
             var movie = _moviesService.GetMovie(id);
             return MapToResource(movie);
+        }
+
+        [HttpGet("list")]
+        public List<int> ListMovies()
+        {
+            var moviesResources = new List<MovieResource>();
+
+            var movieTask = Task.Run(() => _moviesService.AllMovieIds());
+
+            return movieTask.GetAwaiter().GetResult();
+        }
+
+        [HttpPost("bulk")]
+        public List<MovieResource> GetResourceByIds([FromBody] List<int> ids)
+        {
+            var moviesResources = new List<MovieResource>();
+
+            var availDelay = _configService.AvailabilityDelay;
+            var movies = _moviesService.FindByIds(ids);
+
+            foreach (var movie in movies)
+            {
+                moviesResources.Add(movie.ToResource(availDelay, _qualityUpgradableSpecification));
+            }
+
+            return moviesResources;
         }
 
         protected MovieResource MapToResource(Movie movie)

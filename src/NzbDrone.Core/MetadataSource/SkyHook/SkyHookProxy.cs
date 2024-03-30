@@ -360,6 +360,34 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
             return scenes;
         }
 
+        public List<int> GetPerformerMovies(string stashId)
+        {
+            var httpRequest = _whisparrMetadata.Create()
+                                             .SetSegment("route", "performer")
+                                             .Resource($"{stashId}/works")
+                                             .Build();
+
+            httpRequest.AllowAutoRedirect = true;
+            httpRequest.SuppressHttpError = true;
+
+            var httpResponse = _httpClient.Get<PerformerWorksResource>(httpRequest);
+            var movies = httpResponse.Resource.Movies.ConvertAll(int.Parse);
+
+            if (httpResponse.HasHttpError)
+            {
+                if (httpResponse.StatusCode == HttpStatusCode.NotFound)
+                {
+                    throw new MovieNotFoundException(stashId);
+                }
+                else
+                {
+                    throw new HttpException(httpRequest, httpResponse);
+                }
+            }
+
+            return movies;
+        }
+
         public MovieMetadata MapMovie(MovieResource resource)
         {
             var movie = new MovieMetadata();
@@ -569,7 +597,7 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
                 {
                     foreach (var performer in movie.Credits)
                     {
-                        if (performer.Performer.Name.ToLower().Contains(lowerTitle))
+                        if (performer.Performer?.Name != null &&  performer.Performer.Name.ToLower().Contains(lowerTitle))
                         {
                             var mappedPerformer = MapPerformer(performer.Performer);
 

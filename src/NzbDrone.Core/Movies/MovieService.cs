@@ -22,6 +22,7 @@ namespace NzbDrone.Core.Movies
         PagingSpec<Movie> Paged(PagingSpec<Movie> pagingSpec);
         Movie AddMovie(Movie newMovie);
         List<Movie> AddMovies(List<Movie> newMovies);
+        List<Movie> FindByIds(List<int> ids);
         Movie FindByImdbId(string imdbid);
         Movie FindByTmdbId(int tmdbid);
         Movie FindByForeignId(string foreignId);
@@ -34,6 +35,7 @@ namespace NzbDrone.Core.Movies
         List<Movie> GetByPerformerForeignId(string performerForeignId);
         Movie FindByPath(string path);
         Dictionary<int, string> AllMoviePaths();
+        List<int> AllMovieIds();
         List<int> AllMovieTmdbIds();
         List<string> AllMovieForeignIds();
         bool MovieExists(Movie movie);
@@ -167,6 +169,11 @@ namespace NzbDrone.Core.Movies
             return _movieRepository.FindByTitles(lookupTitles);
         }
 
+        public List<Movie> FindByIds(List<int> ids)
+        {
+            return _movieRepository.FindByIds(ids).ToList();
+        }
+
         public Movie FindByImdbId(string imdbid)
         {
             return _movieRepository.FindByImdbId(imdbid);
@@ -190,6 +197,11 @@ namespace NzbDrone.Core.Movies
         public Dictionary<int, string> AllMoviePaths()
         {
             return _movieRepository.AllMoviePaths();
+        }
+
+        public List<int> AllMovieIds()
+        {
+            return _movieRepository.AllMovieIds();
         }
 
         public List<int> AllMovieTmdbIds()
@@ -380,6 +392,10 @@ namespace NzbDrone.Core.Movies
             if (parsedMovieTitle.IsNotNullOrWhiteSpace())
             {
                 var matches = MatchMovies(parsedMovieTitle, movies);
+                if (!matches.Any() && parsedMovieTitle.Contains("xxx"))
+                {
+                    matches = MatchMovies(parsedMovieTitle.TrimAtEnd("xxx"), movies);
+                }
 
                 if (matches.Count > 1)
                 {
@@ -468,6 +484,13 @@ namespace NzbDrone.Core.Movies
 
                 // If parsed title contains a performer and the title then consider a match
                 if (cleanPerformers.Any(x => parsedMovieTitle.Contains(x)) && parsedMovieTitle.Contains(cleanTitle))
+                {
+                    matches.Add(movie);
+                    continue;
+                }
+
+                // Check if it contains the title
+                if (cleanTitle.IsNotNullOrWhiteSpace() && parsedMovieTitle.Replace(" ", "").Contains(cleanTitle.Replace(" ", "")))
                 {
                     matches.Add(movie);
                     continue;

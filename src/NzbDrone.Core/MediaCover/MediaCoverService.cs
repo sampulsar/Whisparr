@@ -326,7 +326,10 @@ namespace NzbDrone.Core.MediaCover
                     alreadyExists = _coverExistsSpecification.AlreadyExists(cover.RemoteUrl, fileName);
 
 #if DEBUG
-                    alreadyExists = true;
+                    if (movie.TmdbId == 0)
+                    {
+                        alreadyExists = true;
+                    }
 #endif
 
                     if (!alreadyExists)

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DryIoc.ImTools;
 using NLog;
 using NzbDrone.Common.Instrumentation.Extensions;
 using NzbDrone.Core.Configuration;
@@ -99,16 +100,17 @@ namespace NzbDrone.Core.Movies.Performers
         {
             if (performer.Monitored)
             {
-                var existingMovies = _movieService.AllMovieForeignIds();
-                var performerScenes = _movieInfo.GetPerformerScenes(performer.ForeignId);
-                var excludedMovies = _importExclusionService.GetAllExclusions().Select(e => e.ForeignId);
-                var moviesToAdd = performerScenes.Where(m => !existingMovies.Contains(m)).Where(m => !excludedMovies.Contains(m));
+                // Chunk the into smaller lists
+                var chunkSize = 10;
 
-                if (moviesToAdd.Any())
+                var existingScenes = _movieService.AllMovieForeignIds();
+                var performerScenes = _movieInfo.GetPerformerScenes(performer.ForeignId);
+                var excludedScenes = _importExclusionService.GetAllExclusions().Select(e => e.ForeignId);
+                var scenesToAdd = performerScenes.Where(m => !existingScenes.Contains(m)).Where(m => !excludedScenes.Contains(m));
+
+                if (scenesToAdd.Any())
                 {
-                    // Chunk the movies into smaller lists
-                    var chunkSize = 10;
-                    var movieLists = moviesToAdd.Select(m => new Movie
+                    var sceneLists = scenesToAdd.Select(m => new Movie
                     {
                         ForeignId = m,
                         QualityProfileId = performer.QualityProfileId,
@@ -121,7 +123,39 @@ namespace NzbDrone.Core.Movies.Performers
                         Monitored = true,
                         Tags = performer.Tags
                     }).ToList()
-                            .Select((x, i) => new { Index = i, Value = x })
+                        .Select((x, i) => new { Index = i, Value = x })
+                            .GroupBy(x => x.Index / chunkSize)
+                            .Select(x => x.Select(v => v.Value).ToList())
+                            .ToList();
+
+                    foreach (var sceneList in sceneLists)
+                    {
+                        _addMovieService.AddMovies(sceneList, true);
+                    }
+                }
+
+                var tmbdId = 0;
+                var existingMovies = _movieService.AllMovieTmdbIds();
+                var performerMovies = _movieInfo.GetPerformerMovies(performer.ForeignId);
+                var excludedMovies = _importExclusionService.GetAllExclusions().Select(e => int.TryParse(e.ForeignId, out tmbdId)).Select(e => tmbdId).Where(e => e != 0).ToList();
+                var moviesToAdd = performerMovies.Where(m => !existingMovies.Contains(m)).Where(m => !excludedMovies.Contains(m));
+
+                if (moviesToAdd.Any())
+                {
+                    var movieLists = moviesToAdd.Select(m => new Movie
+                    {
+                        ForeignId = m.ToString(),
+                        QualityProfileId = performer.QualityProfileId,
+                        RootFolderPath = performer.RootFolderPath,
+                        AddOptions = new AddMovieOptions
+                        {
+                            SearchForMovie = performer.SearchOnAdd,
+                            AddMethod = AddMovieMethod.Performer
+                        },
+                        Monitored = true,
+                        Tags = performer.Tags
+                    }).ToList()
+                        .Select((x, i) => new { Index = i, Value = x })
                             .GroupBy(x => x.Index / chunkSize)
                             .Select(x => x.Select(v => v.Value).ToList())
                             .ToList();
@@ -199,7 +233,7 @@ namespace NzbDrone.Core.Movies.Performers
             }
             else
             {
-                var allPerformers = _performerService.GetAllPerformers().OrderBy(c => c.LastInfoSync).ToList();
+                var allPerformers = _performerService.GetAllPerformers().OrderBy(c => c.SortName).ToList();
 
                 var updatePerformers = new HashSet<string>();
 
@@ -221,11 +255,11 @@ namespace NzbDrone.Core.Movies.Performers
                             performerLocal = RefreshPerformerInfo(performerLocal.Id);
                         }
 
-                        SyncPerformerItems(performerLocal);
+                        SyncPerformerItems(performer);
                     }
-                    catch (Exception e)
+                    catch (MovieNotFoundException)
                     {
-                        _logger.Error(e, "Couldn't refresh info for {0}", performer.Name);
+                        _logger.Error("Performer '{0}' (StashDb {1}) was not found, it may have been removed from The Movie Database.", performer.Name, performer.ForeignId);
                     }
                 }
             }

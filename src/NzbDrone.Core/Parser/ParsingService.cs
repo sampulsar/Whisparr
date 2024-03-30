@@ -166,9 +166,9 @@ namespace NzbDrone.Core.Parser
                     }
                 }
 
-                if (result == null)
+                if (result?.Movie == null)
                 {
-                    _logger.Debug($"No matching scene for studio {parsedMovieInfo.StudioTitle} and release date {parsedMovieInfo.ReleaseDate}");
+                    _logger.Debug($"No matching scene '{searchCriteria}' for studio {parsedMovieInfo.StudioTitle} and release date '{parsedMovieInfo.ReleaseDate}' '{parsedMovieInfo.ReleaseTokens}'");
                 }
             }
             else
