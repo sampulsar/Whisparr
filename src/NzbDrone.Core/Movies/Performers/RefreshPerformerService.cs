@@ -104,9 +104,9 @@ namespace NzbDrone.Core.Movies.Performers
                 var chunkSize = 10;
 
                 var existingScenes = _movieService.AllMovieForeignIds();
-                var performerScenes = _movieInfo.GetPerformerScenes(performer.ForeignId);
+                var performerWork = _movieInfo.GetPerformerWorks(performer.ForeignId);
                 var excludedScenes = _importExclusionService.GetAllExclusions().Select(e => e.ForeignId);
-                var scenesToAdd = performerScenes.Where(m => !existingScenes.Contains(m)).Where(m => !excludedScenes.Contains(m));
+                var scenesToAdd = performerWork.Scenes.Where(m => !existingScenes.Contains(m)).Where(m => !excludedScenes.Contains(m));
 
                 if (scenesToAdd.Any())
                 {
@@ -122,23 +122,18 @@ namespace NzbDrone.Core.Movies.Performers
                         },
                         Monitored = true,
                         Tags = performer.Tags
-                    }).ToList()
-                        .Select((x, i) => new { Index = i, Value = x })
-                            .GroupBy(x => x.Index / chunkSize)
-                            .Select(x => x.Select(v => v.Value).ToList())
-                            .ToList();
+                    }).Chunk(chunkSize);
 
                     foreach (var sceneList in sceneLists)
                     {
-                        _addMovieService.AddMovies(sceneList, true);
+                        _addMovieService.AddMovies(sceneList.ToList(), true);
                     }
                 }
 
                 var tmbdId = 0;
                 var existingMovies = _movieService.AllMovieTmdbIds();
-                var performerMovies = _movieInfo.GetPerformerMovies(performer.ForeignId);
                 var excludedMovies = _importExclusionService.GetAllExclusions().Select(e => int.TryParse(e.ForeignId, out tmbdId)).Select(e => tmbdId).Where(e => e != 0).ToList();
-                var moviesToAdd = performerMovies.Where(m => !existingMovies.Contains(m)).Where(m => !excludedMovies.Contains(m));
+                var moviesToAdd = performerWork.Movies.Where(m => !existingMovies.Contains(m)).Where(m => !excludedMovies.Contains(m));
 
                 if (moviesToAdd.Any())
                 {
@@ -154,15 +149,11 @@ namespace NzbDrone.Core.Movies.Performers
                         },
                         Monitored = true,
                         Tags = performer.Tags
-                    }).ToList()
-                        .Select((x, i) => new { Index = i, Value = x })
-                            .GroupBy(x => x.Index / chunkSize)
-                            .Select(x => x.Select(v => v.Value).ToList())
-                            .ToList();
+                    }).Chunk(chunkSize);
 
                     foreach (var movieList in movieLists)
                     {
-                        _addMovieService.AddMovies(movieList, true);
+                        _addMovieService.AddMovies(movieList.ToList(), true);
                     }
                 }
             }

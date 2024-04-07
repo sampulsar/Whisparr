@@ -63,6 +63,7 @@ namespace NzbDrone.Core.Movies
 
         public List<Movie> AddMovies(List<Movie> newMovies, bool ignoreErrors = false)
         {
+            var httpExceptionCount = 0;
             var added = DateTime.UtcNow;
             var moviesToAdd = new List<Movie>();
             var existingMovieForeignIds = _movieService.AllMovieForeignIds();
@@ -91,6 +92,7 @@ namespace NzbDrone.Core.Movies
                     }
 
                     moviesToAdd.Add(movie);
+                    httpExceptionCount = 0;
                 }
                 catch (ValidationException ex)
                 {
@@ -108,16 +110,15 @@ namespace NzbDrone.Core.Movies
                         throw;
                     }
 
-                    _logger.Debug("Foreign ID {0} was not added due to connection failures. {1}", m.ForeignId, ex.Message);
-                }
-                catch (Exception ex)
-                {
-                    if (!ignoreErrors)
+                    httpExceptionCount++;
+
+                    // Throw exception on the two successive exception
+                    if (httpExceptionCount > 2)
                     {
                         throw;
                     }
 
-                    _logger.Debug("Foreign ID {0} was not added due to failures. {1}", m.ForeignId, ex.Message);
+                    _logger.Debug("Foreign ID {0} was not added due to connection failures. {1}", m.ForeignId, ex.Message);
                 }
             }
 

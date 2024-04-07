@@ -96,16 +96,18 @@ namespace NzbDrone.Core.Movies.Studios
         {
             if (studio.Monitored)
             {
+                // Chunk the into smaller lists
+                var chunkSize = 10;
+
                 var existingMovies = _movieService.AllMovieForeignIds();
                 var studioScenes = _movieInfo.GetStudioScenes(studio.ForeignId);
-                var excludedMovies = _importExclusionService.GetAllExclusions().Select(e => e.ForeignId);
-                var moviesToAdd = studioScenes.Where(m => !existingMovies.Contains(m)).Where(m => !excludedMovies.Contains(m));
+                var excludedScenes = _importExclusionService.GetAllExclusions().Select(e => e.ForeignId);
+                var scenesToAdd = studioScenes.Where(m => !existingMovies.Contains(m)).Where(m => !excludedScenes.Contains(m));
 
-                if (moviesToAdd.Any())
+                if (scenesToAdd.Any())
                 {
-                    // Chunk the movies into smaller lists
-                    var chunkSize = 10;
-                    var movieLists = moviesToAdd.Select(m => new Movie
+
+                    var sceneLists = scenesToAdd.Select(m => new Movie
                     {
                         ForeignId = m,
                         QualityProfileId = studio.QualityProfileId,
@@ -117,15 +119,11 @@ namespace NzbDrone.Core.Movies.Studios
                         },
                         Monitored = true,
                         Tags = studio.Tags
-                    }).ToList()
-                            .Select((x, i) => new { Index = i, Value = x })
-                            .GroupBy(x => x.Index / chunkSize)
-                            .Select(x => x.Select(v => v.Value).ToList())
-                            .ToList();
+                    }).Chunk(chunkSize);
 
-                    foreach (var movieList in movieLists)
+                    foreach (var sceneList in sceneLists)
                     {
-                        _addMovieService.AddMovies(movieList, true);
+                        _addMovieService.AddMovies(sceneList.ToList(), true);
                     }
                 }
             }

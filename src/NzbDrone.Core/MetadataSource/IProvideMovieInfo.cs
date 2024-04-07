@@ -14,10 +14,8 @@ namespace NzbDrone.Core.MetadataSource
         List<MovieMetadata> GetBulkMovieInfo(List<int> tmdbIds);
         Performer GetPerformerInfo(string tmdbId);
         Studio GetStudioInfo(string tmdbId);
-        List<string> GetPerformerScenes(string stashId);
-        List<int> GetPerformerMovies(string stashId);
+        (List<string> Scenes, List<int> Movies) GetPerformerWorks(string stashId);
         List<string> GetStudioScenes(string stashId);
-
         HashSet<int> GetChangedMovies(DateTime startTime);
         HashSet<string> GetChangedScenes(DateTime startTime);
         HashSet<string> GetChangedStudios(DateTime startTime);
