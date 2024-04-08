@@ -153,10 +153,10 @@ namespace NzbDrone.Core.MediaFiles.MovieImport.Manual
                     if (!hasSubfolders)
                     {
                         movie = _parsingService.GetMovie(directoryInfo.Name);
-                        if (movie != null)
+                        if (movie != null && movie.Title.CleanStudioTitle().Equals(directoryInfo.Name.CleanStudioTitle()))
                         {
                             // Check if the folder was a studio
-                            var isStudioName = _studioService.FindAllByTitle(directoryInfo.Name).Any();
+                            var isStudioName = _studioService.FindAllByTitle(movie.Title).Any();
                             if (isStudioName)
                             {
                                 movie = null;
@@ -381,6 +381,27 @@ namespace NzbDrone.Core.MediaFiles.MovieImport.Manual
                 {
                     localMovie.FolderMovieInfo = Parser.Parser.ParseMovieTitle(file.FolderName);
                     localMovie.SceneSource = !existingFile;
+                }
+
+                if (movie.HasFile)
+                {
+                    var qualityProfile = localMovie.Movie.QualityProfile;
+                    var qualityComparer = new QualityModelComparer(qualityProfile);
+                    var qualityCompare = qualityComparer.Compare(localMovie.Quality.Quality, movie.MovieFile.Quality.Quality);
+
+                    if (qualityCompare < 0)
+                    {
+                        try
+                        {
+                            _diskProvider.DeleteFile(file.Path);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error("Delete File error {0} files", file.Path, ex);
+                        }
+
+                        continue;
+                    }
                 }
 
                 // Augment movie file so imported files have all additional information an automatic import would

@@ -81,7 +81,7 @@ namespace NzbDrone.Core.Movies.Studios
             studio.Website = studioInfo.Website;
             studio.Images = studioInfo.Images;
             studio.LastInfoSync = DateTime.UtcNow;
-            studio.CleanTitle = studioInfo.Title.CleanStudioTitle();
+            studio.CleanTitle = studioInfo.CleanTitle;
             studio.SortTitle = studioInfo.SortTitle;
 
             _studioService.Update(studio);
@@ -106,7 +106,6 @@ namespace NzbDrone.Core.Movies.Studios
 
                 if (scenesToAdd.Any())
                 {
-
                     var sceneLists = scenesToAdd.Select(m => new Movie
                     {
                         ForeignId = m,
