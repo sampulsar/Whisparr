@@ -13,7 +13,6 @@ using NzbDrone.Core.Messaging.Events;
 using NzbDrone.Core.MetadataSource;
 using NzbDrone.Core.Movies.Studios.Commands;
 using NzbDrone.Core.Movies.Studios.Events;
-using NzbDrone.Core.Parser;
 
 namespace NzbDrone.Core.Movies.Studios
 {

@@ -69,8 +69,7 @@ namespace NzbDrone.Core.Datastore
                 Username = _configFileProvider.PostgresUser,
                 Password = _configFileProvider.PostgresPassword,
                 Port = _configFileProvider.PostgresPort,
-                Enlist = false,
-                CommandTimeout = 900,
+                Enlist = false
             };
 
             return new DatabaseConnectionInfo(DatabaseType.PostgreSQL, connectionBuilder.ConnectionString);
