@@ -192,7 +192,7 @@ namespace NzbDrone.Core.Movies.Studios
             }
             else
             {
-                var allStudios = _studioService.GetAllStudios().OrderBy(c => c.LastInfoSync).ToList();
+                var allStudios = _studioService.GetAllStudios().OrderBy(c => c.SortTitle).ToList();
 
                 var updatedStudios = new HashSet<string>();
 
