@@ -9,6 +9,7 @@ using NzbDrone.Core.DecisionEngine;
 using NzbDrone.Core.Indexers;
 using NzbDrone.Core.IndexerSearch.Definitions;
 using NzbDrone.Core.Movies;
+using NzbDrone.Core.Movies.Studios;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.Profiles.Qualities;
 
@@ -26,18 +27,21 @@ namespace NzbDrone.Core.IndexerSearch
         private readonly IMakeDownloadDecision _makeDownloadDecision;
         private readonly IMovieService _movieService;
         private readonly IQualityProfileService _qualityProfileService;
+        private readonly IStudioService _studioService;
         private readonly Logger _logger;
 
         public ReleaseSearchService(IIndexerFactory indexerFactory,
                                 IMakeDownloadDecision makeDownloadDecision,
                                 IMovieService movieService,
                                 IQualityProfileService qualityProfileService,
+                                IStudioService studioService,
                                 Logger logger)
         {
             _indexerFactory = indexerFactory;
             _makeDownloadDecision = makeDownloadDecision;
             _movieService = movieService;
             _qualityProfileService = qualityProfileService;
+            _studioService = studioService;
             _logger = logger;
         }
 
@@ -69,6 +73,14 @@ namespace NzbDrone.Core.IndexerSearch
                 if (sceneSearchSpec.SiteTitle != null)
                 {
                     sceneSearchSpec.SceneTitles.Add(sceneSearchSpec.SiteTitle);
+                    var studioTitles = _studioService.FindAllByTitle(sceneSearchSpec.SiteTitle);
+                    foreach (var studioTitle in studioTitles)
+                    {
+                        if (!sceneSearchSpec.SceneTitles.Contains(studioTitle.CleanTitle))
+                        {
+                            sceneSearchSpec.SceneTitles.Add(studioTitle.CleanTitle);
+                        }
+                    }
                 }
 
                 decisions = await Dispatch(indexer => indexer.Fetch(sceneSearchSpec), sceneSearchSpec);
