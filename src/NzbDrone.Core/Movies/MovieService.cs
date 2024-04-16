@@ -392,15 +392,6 @@ namespace NzbDrone.Core.Movies
             if (parsedMovieTitle.IsNotNullOrWhiteSpace())
             {
                 var matches = MatchMovies(parsedMovieTitle, movies);
-                if (!matches.Any() && parsedMovieTitle.Contains("xxx"))
-                {
-                    matches = MatchMovies(parsedMovieTitle.TrimAtEnd("xxx"), movies);
-                }
-
-                if (matches.Count > 1)
-                {
-                    matches = MatchMovies(parsedMovieTitle, movies, true);
-                }
 
                 if (matches.Count == 1)
                 {
@@ -424,7 +415,7 @@ namespace NzbDrone.Core.Movies
             return null;
         }
 
-        private List<Movie> MatchMovies(string parsedMovieTitle, List<Movie> movies, bool strict = false)
+        private List<Movie> MatchMovies(string parsedMovieTitle, List<Movie> movies, int matchLevel = 0)
         {
             var matches = new List<Movie>();
 
@@ -446,8 +437,13 @@ namespace NzbDrone.Core.Movies
                     continue;
                 }
 
+                if (matchLevel > 2)
+                {
+                    continue;
+                }
+
                 var cleanPerformers = movie.MovieMetadata.Value.Credits.Select(a => Parser.Parser.NormalizeEpisodeTitle(a.Performer.Name))
-                                                                       .Where(x => x.IsNotNullOrWhiteSpace());
+                                                    .Where(x => x.IsNotNullOrWhiteSpace());
 
                 if (cleanPerformers.Empty())
                 {
@@ -461,14 +457,29 @@ namespace NzbDrone.Core.Movies
                     continue;
                 }
 
-                if (strict)
+                if (matchLevel > 1)
                 {
                     continue;
                 }
 
                 var cleanFemalePerformers = movie.MovieMetadata.Value.Credits.Where(a => a.Performer.Gender == Gender.Female)
-                                                                             .Select(a => Parser.Parser.NormalizeEpisodeTitle(a.Performer.Name))
-                                                                             .Where(x => x.IsNotNullOrWhiteSpace()).ToList();
+                                                          .Select(a => Parser.Parser.NormalizeEpisodeTitle(a.Performer.Name))
+                                                          .Where(x => x.IsNotNullOrWhiteSpace()).ToList();
+
+                if (cleanTitle.IsNotNullOrWhiteSpace())
+                {
+                    // If parsed title contains a performer and the title then consider a match
+                    if (cleanPerformers.Any(x => parsedMovieTitle.Contains(x)) && parsedMovieTitle.Contains(cleanTitle))
+                    {
+                        matches.Add(movie);
+                        continue;
+                    }
+                }
+
+                if (matchLevel > 0)
+                {
+                    continue;
+                }
 
                 // If all female performers are in title, consider a match
                 if (cleanFemalePerformers.Any() && cleanFemalePerformers.All(x => parsedMovieTitle.Contains(x)))
@@ -476,25 +487,11 @@ namespace NzbDrone.Core.Movies
                     matches.Add(movie);
                     continue;
                 }
+            }
 
-                if (cleanTitle.IsNullOrWhiteSpace())
-                {
-                    continue;
-                }
-
-                // If parsed title contains a performer and the title then consider a match
-                if (cleanPerformers.Any(x => parsedMovieTitle.Contains(x)) && parsedMovieTitle.Contains(cleanTitle))
-                {
-                    matches.Add(movie);
-                    continue;
-                }
-
-                // Check if it contains the title
-                if (cleanTitle.IsNotNullOrWhiteSpace() && parsedMovieTitle.Replace(" ", "").Contains(cleanTitle.Replace(" ", "")))
-                {
-                    matches.Add(movie);
-                    continue;
-                }
+            if (matches.Count > 1 && matchLevel < 2)
+            {
+                matches = MatchMovies(parsedMovieTitle, matches, matchLevel + 1);
             }
 
             return matches;
