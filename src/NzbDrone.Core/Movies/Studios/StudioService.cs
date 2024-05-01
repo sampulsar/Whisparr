@@ -49,6 +49,21 @@ namespace NzbDrone.Core.Movies.Studios
                             value = "LegalPorno";
                         }
 
+                        if (value == "The Score Group")
+                        {
+                            value = "PornMegaLoad";
+                        }
+
+                        if (value == "The Score Group")
+                        {
+                            value = "PornMegaLoad";
+                        }
+
+                        if (value == "ManyVids")
+                        {
+                            value = $"ManyVids {studio.Title}";
+                        }
+
                         _aliases.Add(studio.Title, value);
                     }
                 }
@@ -123,22 +138,21 @@ namespace NzbDrone.Core.Movies.Studios
             var cleanTitle = title.CleanStudioTitle();
 
             var findAllByTitle = _studioRepo.FindAllByTitle(cleanTitle);
+            var alternativeTitles = StudioAliasesToStutioTitle(cleanTitle);
 
-            if (!findAllByTitle.Any())
+            if (alternativeTitles.Any())
             {
-                var alternativeTitles = StudioAliasesToStutioTitle(cleanTitle);
-
-                if (alternativeTitles.Any())
+                foreach (var alternativeTitle in alternativeTitles)
                 {
-                    foreach (var alternativeTitle in alternativeTitles)
+                    var findAllByTitleAlternative = _studioRepo.FindAllByTitle(alternativeTitle.CleanStudioTitle());
+                    if (findAllByTitleAlternative.Any())
                     {
-                        var findAllByTitleAlternative = _studioRepo.FindAllByTitle(alternativeTitle.CleanStudioTitle());
                         findAllByTitle.AddRange(findAllByTitleAlternative);
                     }
-                }
-                else
-                {
-                    findAllByTitle.Add(new Studio());
+                    else
+                    {
+                        findAllByTitle.Add(new Studio { Title = alternativeTitle, CleanTitle = alternativeTitle.CleanStudioTitle() });
+                    }
                 }
             }
 

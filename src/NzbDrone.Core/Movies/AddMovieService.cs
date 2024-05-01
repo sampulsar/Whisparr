@@ -120,6 +120,15 @@ namespace NzbDrone.Core.Movies
 
                     _logger.Debug("Foreign ID {0} was not added due to connection failures. {1}", m.ForeignId, ex.Message);
                 }
+                catch (Exception ex)
+                {
+                    if (!ignoreErrors)
+                    {
+                        throw;
+                    }
+
+                    _logger.Debug("Foreign ID {0} was not added due to failures. {1}", m.ForeignId, ex.Message);
+                }
             }
 
             try

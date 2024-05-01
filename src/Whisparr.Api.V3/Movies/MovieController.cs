@@ -103,7 +103,7 @@ namespace Whisparr.Api.V3.Movies
         }
 
         [HttpGet]
-        public List<MovieResource> AllMovie(int? tmdbId, bool excludeLocalCovers = false)
+        public List<MovieResource> AllMovie(int? tmdbId, string stashId, bool excludeLocalCovers = false)
         {
             var moviesResources = new List<MovieResource>();
 
@@ -112,6 +112,15 @@ namespace Whisparr.Api.V3.Movies
             if (tmdbId.HasValue)
             {
                 var movie = _moviesService.FindByTmdbId(tmdbId.Value);
+
+                if (movie != null)
+                {
+                    moviesResources.AddIfNotNull(MapToResource(movie));
+                }
+            }
+            else if (stashId.IsNotNullOrWhiteSpace())
+            {
+                var movie = _moviesService.FindByForeignId(stashId);
 
                 if (movie != null)
                 {
