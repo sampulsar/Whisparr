@@ -273,7 +273,7 @@ namespace NzbDrone.Core.Movies
             else
             {
                 // TODO refresh all moviemetadata here, even if not used by a Movie
-                var allMovie = _movieService.GetAllMovies().OrderBy(c => c.MovieMetadata.Value.SortTitle).ToList();
+                var allMovie = _movieService.GetAllMovies().OrderBy(c => c.MovieMetadata.Value.LastInfoSync).ToList();
 
                 var updatedMovies = new HashSet<string>();
                 var updatedScenes = new HashSet<string>();
