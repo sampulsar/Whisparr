@@ -241,6 +241,11 @@ namespace NzbDrone.Core.Download.Clients.Deluge
                     throw new DownloadClientAuthenticationException(error.Message);
                 }
 
+                if (error.Code == 4)
+                {
+                    return response.Result;
+                }
+
                 throw new DelugeException(error.Message, error.Code);
             }
 
