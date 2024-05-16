@@ -272,9 +272,6 @@ namespace NzbDrone.Core.Movies
             }
             else
             {
-                // TODO refresh all moviemetadata here, even if not used by a Movie
-                var allMovie = _movieService.GetAllMovies().OrderBy(c => c.MovieMetadata.Value.SortTitle).ToList();
-
                 var updatedMovies = new HashSet<string>();
                 var updatedScenes = new HashSet<string>();
 
@@ -284,36 +281,42 @@ namespace NzbDrone.Core.Movies
                     updatedScenes = _movieInfo.GetChangedScenes(message.LastStartTime.Value);
                 }
 
-                foreach (var movie in allMovie)
+                var movieLists = _movieService.AllMovieIds().Chunk(1000);
+                foreach (var movieList in movieLists)
                 {
-                    var movieLocal = movie;
-                    if ((updatedMovies.Count == 0 && _checkIfMovieShouldBeRefreshed.ShouldRefresh(movie.MovieMetadata)) ||
-                        updatedMovies.Contains(movie.ForeignId) ||
-                        updatedScenes.Contains(movie.ForeignId) ||
-                        message.Trigger == CommandTrigger.Manual)
-                    {
-                        try
-                        {
-                            movieLocal = RefreshMovieInfo(movieLocal.Id);
-                        }
-                        catch (MovieNotFoundException)
-                        {
-                            _logger.Error("Item '{0}' (ForeignId {1}) was not found, it may have been removed from The Movie Database.", movieLocal.Title, movieLocal.ForeignId);
-                            continue;
-                        }
-                        catch (Exception e)
-                        {
-                            _logger.Error(e, "Couldn't refresh info for {0}", movieLocal);
-                        }
+                    var allMovie = _movieService.GetMovies(movieList).ToList();
 
-                        UpdateTags(movie);
-                        RescanMovie(movieLocal, false, trigger);
-                    }
-                    else
+                    foreach (var movie in allMovie)
                     {
-                        _logger.Debug("Skipping refresh of movie: {0}", movieLocal.Title);
-                        UpdateTags(movie);
-                        RescanMovie(movieLocal, false, trigger);
+                        var movieLocal = movie;
+                        if ((updatedMovies.Count == 0 && _checkIfMovieShouldBeRefreshed.ShouldRefresh(movie.MovieMetadata)) ||
+                            updatedMovies.Contains(movie.ForeignId) ||
+                            updatedScenes.Contains(movie.ForeignId) ||
+                            message.Trigger == CommandTrigger.Manual)
+                        {
+                            try
+                            {
+                                movieLocal = RefreshMovieInfo(movieLocal.Id);
+                            }
+                            catch (MovieNotFoundException)
+                            {
+                                _logger.Error("Item '{0}' (ForeignId {1}) was not found, it may have been removed from The Movie Database.", movieLocal.Title, movieLocal.ForeignId);
+                                continue;
+                            }
+                            catch (Exception e)
+                            {
+                                _logger.Error(e, "Couldn't refresh info for {0}", movieLocal);
+                            }
+
+                            UpdateTags(movie);
+                            RescanMovie(movieLocal, false, trigger);
+                        }
+                        else
+                        {
+                            _logger.Debug("Skipping refresh of movie: {0}", movieLocal.Title);
+                            UpdateTags(movie);
+                            RescanMovie(movieLocal, false, trigger);
+                        }
                     }
                 }
             }
