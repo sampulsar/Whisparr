@@ -54,11 +54,6 @@ namespace NzbDrone.Core.Movies.Studios
                             value = "PornMegaLoad";
                         }
 
-                        if (value == "The Score Group")
-                        {
-                            value = "PornMegaLoad";
-                        }
-
                         if (value == "ManyVids")
                         {
                             value = $"ManyVids {studio.Title}";

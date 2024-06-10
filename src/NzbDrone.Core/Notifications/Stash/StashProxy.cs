@@ -28,17 +28,21 @@ namespace NzbDrone.Core.Notifications.Stash
                 $@"metadataIdentify(
                     input: {{
                         sources: [
-                            {{source: {{stash_box_endpoint:""https://stashdb.org/graphql""}} }}, 
-                            {{source: {{scraper_id: ""builtin_autotag""}}, options: {{setOrganized: false}} }}
+                            {{source: {{stash_box_endpoint:""https://stashdb.org/graphql""}} }}
                         ],
                         options: {{
                             includeMalePerformers: {(settings.IncludeMalePerformers ? "true" : "false")},
                             setCoverImage: true,
+                            skipMultipleMatches: true,
+                            skipMultipleMatchTag: ""1"",
                             setOrganized: {(settings.SetOrganized ? "true" : "false")},
                             fieldOptions: [
-                                {{ field: ""studio"", strategy: MERGE, createMissing: true }},
-                                {{ field: ""performers"", strategy: MERGE, createMissing: true }},
-                                {{ field: ""tags"", strategy: MERGE, createMissing: true }}
+                                {{ field: ""title"", strategy: OVERWRITE, createMissing: null }},
+                                {{ field: ""studio"", strategy: OVERWRITE, createMissing: true }},
+                                {{ field: ""performers"", strategy: OVERWRITE, createMissing: true }},
+                                {{ field: ""tags"", strategy: OVERWRITE, createMissing: true }},
+                                {{ field: ""date"", strategy: OVERWRITE, createMissing: false }},
+                                {{ field: ""stash_ids"", strategy: OVERWRITE, createMissing: false }}
                             ]
                         }}, 
                         paths: [{cleanPath}]
