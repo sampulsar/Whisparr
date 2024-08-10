@@ -151,11 +151,7 @@ namespace NzbDrone.Core.Movies.Studios
                 }
             }
 
-        public List<Studio> FindAllByTitle(string title)
-        {
-            var cleanTitle = title.CleanStudioTitle();
-
-            return _studioRepo.FindAllByTitle(cleanTitle);
+            return findAllByTitle;
         }
 
         public Studio FindByForeignId(string foreignId)
