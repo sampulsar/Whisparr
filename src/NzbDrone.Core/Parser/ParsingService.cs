@@ -152,16 +152,13 @@ namespace NzbDrone.Core.Parser
             {
                 var studios = _studioService.FindAllByTitle(parsedMovieInfo.StudioTitle);
 
-                if (studios != null)
+                if (studios != null && studios.Count > 0)
                 {
                     foreach (var studio in studios)
                     {
-                        if (studio != null)
+                        if (result == null)
                         {
-                            if (result == null)
-                            {
-                                result = GetSceneMovie(studio, parsedMovieInfo.ReleaseDate, parsedMovieInfo.ReleaseTokens, searchCriteria);
-                            }
+                            result = GetSceneMovie(studio, parsedMovieInfo.ReleaseDate, parsedMovieInfo.ReleaseTokens, searchCriteria);
                         }
                     }
                 }

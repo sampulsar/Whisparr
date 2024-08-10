@@ -387,6 +387,13 @@ namespace NzbDrone.Core.Movies
                 return null;
             }
 
+            var matchByDate = _movieRepository.MatchByDate(studioForeignId);
+
+            if (matchByDate && movies.Count == 1)
+            {
+                return movies.First();
+            }
+
             var parsedMovieTitle = Parser.Parser.NormalizeEpisodeTitle(releaseTokens);
 
             if (parsedMovieTitle.IsNotNullOrWhiteSpace())
@@ -437,7 +444,19 @@ namespace NzbDrone.Core.Movies
                     continue;
                 }
 
-                if (matchLevel > 2)
+                if (matchLevel > 3)
+                {
+                    continue;
+                }
+
+                // If parsed title contains title, consider a match
+                if (cleanTitle.IsNotNullOrWhiteSpace() && parsedMovieTitle.Contains(cleanTitle))
+                {
+                    matches.Add(movie);
+                    continue;
+                }
+
+                if (matchLevel > 3)
                 {
                     continue;
                 }

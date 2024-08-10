@@ -23,7 +23,12 @@ namespace NzbDrone.Core.Movies.Studios
 
         public Studio FindByTitle(string title)
         {
-            return Query(x => x.CleanTitle == title).FirstOrDefault();
+            return FindAllByTitle(title).FirstOrDefault();
+        }
+
+        public List<Studio> FindAllByTitle(string title)
+        {
+            return Query(x => x.CleanTitle == title);
         }
 
         public List<Studio> FindAllByTitle(string title)
