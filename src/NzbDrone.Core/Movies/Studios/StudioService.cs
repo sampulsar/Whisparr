@@ -139,7 +139,7 @@ namespace NzbDrone.Core.Movies.Studios
             {
                 foreach (var alternativeTitle in alternativeTitles)
                 {
-                    var findAllByTitleAlternative = _studioRepo.FindAllByTitle(alternativeTitle.CleanStudioTitle());
+                    var findAllByTitleAlternative = _studioRepo.FindAllByTitle(alternativeTitle.CleanStudioTitle().ToLower());
                     if (findAllByTitleAlternative.Any())
                     {
                         findAllByTitle.AddRange(findAllByTitleAlternative);
