@@ -525,12 +525,12 @@ namespace NzbDrone.Core.Parser
 
         public static string CleanStudioTitle(this string title)
         {
-            if (title.IsNullOrWhiteSpace())
+            if (title.IsNotNullOrWhiteSpace())
             {
-                return string.Empty;
+                return title.Replace(" ", "").CleanMovieTitle();
             }
 
-            return title.Replace(" ", "").CleanMovieTitle();
+            return string.Empty;
         }
 
         public static string CleanMovieTitle(this string title)
