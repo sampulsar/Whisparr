@@ -303,6 +303,11 @@ namespace NzbDrone.Core.Parser
                 movieInfo = movie;
             }
 
+            if (movieInfo == null)
+            {
+                return null;
+            }
+
             return new FindMovieResult(movieInfo, MovieMatchType.Title);
         }
     }

@@ -83,6 +83,11 @@ namespace NzbDrone.Core.IndexerSearch
                     }
                 }
 
+                if (sceneSearchSpec.SiteTitle.Contains(' ', StringComparison.Ordinal))
+                {
+                    sceneSearchSpec.SceneTitles.Add(sceneSearchSpec.SiteTitle.Replace(" ", "", StringComparison.Ordinal));
+                }
+
                 decisions = await Dispatch(indexer => indexer.Fetch(sceneSearchSpec), sceneSearchSpec);
             }
 

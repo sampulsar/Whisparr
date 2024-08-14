@@ -7,6 +7,7 @@ namespace NzbDrone.Core.Test.ParserTests
     [TestFixture]
     public class ParseMovieTitleFixture : CoreTest
     {
+
         [TestCase("LoveHerBoobs 24 06 11 Peachy Alice Successful Provocation XXX 720p AV1 XLeech.mkv", true)]
         [TestCase("Studio.E1224.Title.XXX.720p.HEVC.x265.PRT[XvX]", true)]
         [TestCase("[Studio] Performer Name (Title / 08.01.2021) [2021 г., Big Tits, Blowjob, Brunette, Chubby, Curvy, Cowgirl, Reverse Cowgirl, Cumshots, Facials, Long Hair, Doggy Style, Hardcore, Missionary, PAWG, POV, Trimmed Pussy, Tattoo, Czech, VR, 8K, 3840p] [Oculus Rift / Vive]", true)]
