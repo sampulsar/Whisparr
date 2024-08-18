@@ -10,6 +10,7 @@ using NzbDrone.Core.Blocklisting;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Exceptions;
 using NzbDrone.Core.Indexers;
+using NzbDrone.Core.Localization;
 using NzbDrone.Core.MediaFiles.TorrentInfo;
 using NzbDrone.Core.Organizer;
 using NzbDrone.Core.Parser.Model;
@@ -26,13 +27,14 @@ namespace NzbDrone.Core.Download
         protected readonly ITorrentFileInfoReader _torrentFileInfoReader;
 
         protected TorrentClientBase(ITorrentFileInfoReader torrentFileInfoReader,
-                                    IHttpClient httpClient,
-                                    IConfigService configService,
-                                    IDiskProvider diskProvider,
-                                    IRemotePathMappingService remotePathMappingService,
-                                    IBlocklistService blocklistService,
-                                    Logger logger)
-            : base(configService, diskProvider, remotePathMappingService, logger)
+            IHttpClient httpClient,
+            IConfigService configService,
+            IDiskProvider diskProvider,
+            IRemotePathMappingService remotePathMappingService,
+            ILocalizationService localizationService,
+            IBlocklistService blocklistService,
+            Logger logger)
+            : base(configService, diskProvider, remotePathMappingService, logger, localizationService)
         {
             _httpClient = httpClient;
             _blocklistService = blocklistService;
@@ -223,9 +225,7 @@ namespace NzbDrone.Core.Download
             }
             catch (FormatException ex)
             {
-                _logger.Error(ex, "Failed to parse magnetlink for movie '{0}': '{1}'", remoteMovie.Release.Title, magnetUrl);
-
-                return null;
+                throw new ReleaseDownloadException(remoteMovie.Release, "Failed to parse magnetlink for movie '{0}': '{1}'", ex, remoteMovie.Release.Title, magnetUrl);
             }
 
             if (hash != null)

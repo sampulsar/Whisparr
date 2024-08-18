@@ -75,7 +75,6 @@ class AddNewMovieSearchResult extends Component {
       colorImpairedMode,
       id,
       monitored,
-      hasFile,
       isAvailable,
       movieFile,
       queueItem,
@@ -89,7 +88,11 @@ class AddNewMovieSearchResult extends Component {
       isNewAddMovieModalOpen
     } = this.state;
 
+    const hasMovieFile = !!movieFile;
+
     const linkProps = isExistingMovie ? { to: `/movie/${titleSlug}` } : { onPress: this.onPress };
+    const providerProps = itemType === 'movie' ? { tmdbId: foreignId } : { stashId: foreignId };
+
     let ImageItem = MoviePoster;
     let posterWidth = 167;
     let posterHeight = 250;
@@ -136,7 +139,7 @@ class AddNewMovieSearchResult extends Component {
                       movieId={existingMovieId}
                       movieFile={movieFile}
                       monitored={monitored}
-                      hasFile={hasFile}
+                      hasFile={hasMovieFile}
                       status={status}
                       width={posterWidth}
                       detailedProgressBar={true}
@@ -256,7 +259,7 @@ class AddNewMovieSearchResult extends Component {
                 }
                 tooltip={
                   <MovieDetailsLinks
-                    tmdbId={foreignId}
+                    {...providerProps}
                   />
                 }
                 canFlip={true}
@@ -267,7 +270,7 @@ class AddNewMovieSearchResult extends Component {
               {
                 isExistingMovie && isSmallScreen &&
                   <MovieStatusLabel
-                    hasMovieFiles={hasFile}
+                    hasMovieFiles={hasMovieFile}
                     monitored={monitored}
                     isAvailable={isAvailable}
                     queueItem={queueItem}
@@ -318,7 +321,6 @@ AddNewMovieSearchResult.propTypes = {
   isSmallScreen: PropTypes.bool.isRequired,
   id: PropTypes.number,
   monitored: PropTypes.bool.isRequired,
-  hasFile: PropTypes.bool.isRequired,
   isAvailable: PropTypes.bool.isRequired,
   movieFile: PropTypes.object,
   queueItem: PropTypes.object,
