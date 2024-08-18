@@ -61,6 +61,7 @@ namespace NzbDrone.Core.Configuration
         string PostgresMainDb { get; }
         string PostgresLogDb { get; }
         string Theme { get; }
+        string WhisparrMetadata { get; }
     }
 
     public class ConfigFileProvider : IConfigFileProvider
@@ -150,6 +151,22 @@ namespace NzbDrone.Core.Configuration
                 }
 
                 return bindAddress;
+            }
+        }
+
+        public string WhisparrMetadata
+        {
+            get
+            {
+                const string defaultValue = "https://api.whisparr.com/v4/{route}";
+
+                var whisparrMetadata = GetValue("WhisparrMetadata", defaultValue);
+                if (string.IsNullOrWhiteSpace(whisparrMetadata))
+                {
+                    return defaultValue;
+                }
+
+                return whisparrMetadata;
             }
         }
 

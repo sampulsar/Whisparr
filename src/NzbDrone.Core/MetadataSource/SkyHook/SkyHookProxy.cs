@@ -33,12 +33,15 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
         public SkyHookProxy(IHttpClient httpClient,
             IWhisparrCloudRequestBuilder requestBuilder,
             IConfigService configService,
+            IConfigFileProvider configFileProvider,
             IMovieService movieService,
             IMovieMetadataService movieMetadataService,
             Logger logger)
         {
             _httpClient = httpClient;
-            _whisparrMetadata = requestBuilder.WhisparrMetadata;
+            logger.Info($"Using WhisparrMetadata {configFileProvider.WhisparrMetadata}");
+            _whisparrMetadata = new HttpRequestBuilder(configFileProvider.WhisparrMetadata)
+                .CreateFactory();
             _configService = configService;
             _movieService = movieService;
             _movieMetadataService = movieMetadataService;
