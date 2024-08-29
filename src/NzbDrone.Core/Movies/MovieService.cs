@@ -380,6 +380,21 @@ namespace NzbDrone.Core.Movies
 
         public Movie FindByStudioAndReleaseDate(string studioForeignId, string releaseDate, string releaseTokens)
         {
+            if (string.IsNullOrEmpty(studioForeignId))
+            {
+                studioForeignId = string.Empty;
+            }
+
+            if (string.IsNullOrEmpty(releaseDate))
+            {
+                releaseDate = string.Empty;
+            }
+
+            if (string.IsNullOrEmpty(releaseTokens))
+            {
+                releaseTokens = string.Empty;
+            }
+
             // match by just date
             var matchByDate = _movieRepository.MatchByDate(studioForeignId);
 

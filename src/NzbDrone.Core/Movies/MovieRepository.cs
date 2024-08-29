@@ -186,27 +186,32 @@ namespace NzbDrone.Core.Movies
 
         public bool MatchByDate(string studioForeignId)
         {
-            var builder = new SqlBuilder(_database.DatabaseType)
-               .Join<Movie, MovieMetadata>((m, p) => m.MovieMetadataId == p.Id)
-               .Where<MovieMetadata>(x => x.StudioForeignId == studioForeignId);
-
-            var movies = _database.QueryJoined<Movie, MovieMetadata>(
-                builder,
-                (movie, metadata) =>
-                {
-                    movie.MovieMetadata = metadata;
-
-                    return movie;
-                }).ToList().OrderBy(x => x.MovieMetadata.Value.ReleaseDate);
-
-            var releaseDate = movies.FirstOrDefault().MovieMetadata.Value.ReleaseDate;
-
-            foreach (var movie in movies)
+            if (!string.IsNullOrEmpty(studioForeignId))
             {
-                if (releaseDate == movie.MovieMetadata.Value.ReleaseDate)
+                var builder = new SqlBuilder(_database.DatabaseType)
+                           .Join<Movie, MovieMetadata>((m, p) => m.MovieMetadataId == p.Id)
+                           .Where<MovieMetadata>(x => x.StudioForeignId == studioForeignId);
+
+                var movies = _database.QueryJoined<Movie, MovieMetadata>(
+                    builder,
+                    (movie, metadata) =>
+                    {
+                        movie.MovieMetadata = metadata;
+
+                        return movie;
+                    }).ToList().OrderBy(x => x.MovieMetadata.Value.ReleaseDate);
+
+                var releaseDate = movies.FirstOrDefault().MovieMetadata.Value.ReleaseDate;
+
+                foreach (var movie in movies)
                 {
-                    return false;
+                    if (releaseDate == movie.MovieMetadata.Value.ReleaseDate)
+                    {
+                        return false;
+                    }
                 }
+
+                return true;
             }
 
             return true;
