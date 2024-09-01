@@ -593,14 +593,14 @@ namespace NzbDrone.Core.Parser
                 return string.Empty;
             }
 
+            // Standard & as and
+            title = title.Replace(" & ", " and ");
+
             title = SpecialEpisodeWordRegex.Replace(title, string.Empty);
             title = PunctuationRegex.Replace(title, " ");
             title = EmojiRegex.Replace(title, " ");
             title = UniCodeRegex.Replace(title, " ");
             title = DuplicateSpacesRegex.Replace(title, " ");
-
-            // Standard & as and
-            title = title.Replace(" & ", " and ");
 
             return title.Trim()
                         .ToLower();
