@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -156,7 +157,7 @@ namespace NzbDrone.Core.Parser
                 {
                     foreach (var studio in studios)
                     {
-                        if (result == null)
+                        if (result == null && studio != null)
                         {
                             result = GetSceneMovie(studio, parsedMovieInfo.ReleaseDate, parsedMovieInfo.ReleaseTokens, searchCriteria);
                         }
@@ -278,8 +279,15 @@ namespace NzbDrone.Core.Parser
         private FindMovieResult GetSceneMovie(Studio studio, string airDate, string part, SearchCriteriaBase searchCriteria)
         {
             Movie movieInfo = null;
-
-            var movie = _movieService.FindByStudioAndReleaseDate(studio.ForeignId, airDate, part);
+            Movie movie = null;
+            try
+            {
+                movie = _movieService.FindByStudioAndReleaseDate(studio.ForeignId, airDate, part);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("FindByStudioAndReleaseDate Failed for {0] {1} {2} {3}", studio?.ForeignId, airDate, part, ex.Message);
+            }
 
             if (movie != null && searchCriteria != null)
             {

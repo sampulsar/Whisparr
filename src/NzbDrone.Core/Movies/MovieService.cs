@@ -396,7 +396,7 @@ namespace NzbDrone.Core.Movies
             }
 
             // match by just date
-            var matchByDate = _movieRepository.MatchByDate(studioForeignId);
+            var matchByDate = false; // _movieRepository.MatchByDate(studioForeignId);
 
             var movies = new List<Movie>();
             if (releaseDate.IsNotNullOrWhiteSpace())
@@ -450,6 +450,8 @@ namespace NzbDrone.Core.Movies
         private List<Movie> MatchMovies(string parsedMovieTitle, List<Movie> movies, int matchLevel = 0)
         {
             var matches = new List<Movie>();
+
+            _logger.Debug("Checking {0} against {1} movies", parsedMovieTitle, movies.Count);
 
             foreach (var movie in movies)
             {
@@ -570,6 +572,7 @@ namespace NzbDrone.Core.Movies
 
             if (matches.Count > 1 && matchLevel < 6)
             {
+                _logger.Debug("matched {0} against {1} and found {2}", matches.Count, parsedMovieTitle, string.Join(", ", movies));
                 matches = MatchMovies(parsedMovieTitle, matches, matchLevel + 1);
             }
 

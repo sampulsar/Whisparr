@@ -90,9 +90,19 @@ namespace NzbDrone.Core.Movies
         {
             var result = string.Empty;
 
-            if (MovieMetadata.Value.Title != null)
+            if (MovieMetadata.Value.ItemType == ItemType.Scene)
             {
-                result += string.Format("[{0} ({1})]", MovieMetadata.Value.Title.NullSafe(), MovieMetadata.Value.Year.NullSafe());
+                if (MovieMetadata.Value.Title != null)
+                {
+                    result += string.Format("[{0} - {1} - {2}]", MovieMetadata.Value.StudioTitle.NullSafe(), MovieMetadata.Value.ReleaseDate.NullSafe(), MovieMetadata.Value.Title.NullSafe());
+                }
+            }
+            else
+            {
+                if (MovieMetadata.Value.Title != null)
+                {
+                    result += string.Format("[{0} ({1})]", MovieMetadata.Value.Title.NullSafe(), MovieMetadata.Value.Year.NullSafe());
+                }
             }
 
             if (MovieMetadata.Value.ImdbId != null)
