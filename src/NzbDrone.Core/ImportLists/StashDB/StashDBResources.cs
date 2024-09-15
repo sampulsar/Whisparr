@@ -61,12 +61,12 @@ namespace NzbDrone.Core.ImportLists.StashDB
             }
         }
 
-        public QuerySceneQuery(int page, int pageSize, FavoriteFilter filter)
+        public QuerySceneQuery(int page, int pageSize, FavoriteFilter filter, SceneSort sort)
         {
             _query = @"
-                        query QueryScenes($page: Int!, $perPage: Int!, $favorites: FavoriteFilter!) {
+                        query QueryScenes($sort: SceneSortEnum!, $page: Int!, $perPage: Int!, $favorites: FavoriteFilter!) {
                             queryScenes(
-                                input: { sort: DATE, direction: DESC, favorites: $favorites, per_page: $perPage, page: $page }
+                                input: { sort: $sort, direction: DESC, favorites: $favorites, per_page: $perPage, page: $page }
                             ) {
                                 scenes {
                                     id
@@ -82,7 +82,7 @@ namespace NzbDrone.Core.ImportLists.StashDB
                             }
                         }
                         ";
-            _variables = new QuerySceneQueryVariables(page, pageSize, filter);
+            _variables = new QuerySceneQueryVariables(page, pageSize, filter, sort);
         }
 
         public void SetPage(int page)
@@ -102,11 +102,15 @@ namespace NzbDrone.Core.ImportLists.StashDB
         [JsonProperty("favorites")]
         public FavoriteFilter Filter { get; set; }
 
-        public QuerySceneQueryVariables(int page, int pageSize, FavoriteFilter filter)
+        [JsonProperty("sort")]
+        public SceneSort Sort { get; set; }
+
+        public QuerySceneQueryVariables(int page, int pageSize, FavoriteFilter filter, SceneSort sort)
         {
             Page = page;
             PageSize = pageSize;
             Filter = filter;
+            Sort = sort;
         }
     }
 }

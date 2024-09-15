@@ -33,7 +33,7 @@ namespace NzbDrone.Core.ImportLists.StashDB
         {
             Logger.Info($"Importing StashDB scenes from favorites: {Settings.Filter}");
 
-            var querySceneQuery = new QuerySceneQuery(1, _pageSize, Settings.Filter);
+            var querySceneQuery = new QuerySceneQuery(1, _pageSize, Settings.Filter, Settings.Sort);
 
             var requestBuilder = RequestBuilder
                                         .Create()
