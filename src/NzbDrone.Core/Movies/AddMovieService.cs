@@ -160,7 +160,7 @@ namespace NzbDrone.Core.Movies
             }
             catch (MovieNotFoundException)
             {
-                _logger.Error("TmdbId {0} was not found, it may have been removed from TMDb. Path: {1}", newMovie.ForeignId, newMovie.Path);
+                _logger.Error("StashDBID {0} was not found, it may have been removed from StashDB. Path: {1}", newMovie.ForeignId, newMovie.Path);
 
                 throw new ValidationException(new List<ValidationFailure>
                                               {

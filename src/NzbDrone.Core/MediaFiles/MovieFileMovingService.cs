@@ -26,6 +26,7 @@ namespace NzbDrone.Core.MediaFiles
     {
         private readonly IUpdateMovieFileService _updateMovieFileService;
         private readonly IBuildFileNames _buildFileNames;
+        private readonly IBuildMoviePaths _buildMoviePaths;
         private readonly IDiskTransferService _diskTransferService;
         private readonly IDiskProvider _diskProvider;
         private readonly IMediaFileAttributeService _mediaFileAttributeService;
@@ -37,6 +38,7 @@ namespace NzbDrone.Core.MediaFiles
 
         public MovieFileMovingService(IUpdateMovieFileService updateMovieFileService,
                                 IBuildFileNames buildFileNames,
+                                IBuildMoviePaths buildMoviePaths,
                                 IDiskTransferService diskTransferService,
                                 IDiskProvider diskProvider,
                                 IMediaFileAttributeService mediaFileAttributeService,
@@ -48,6 +50,7 @@ namespace NzbDrone.Core.MediaFiles
         {
             _updateMovieFileService = updateMovieFileService;
             _buildFileNames = buildFileNames;
+            _buildMoviePaths = buildMoviePaths;
             _diskTransferService = diskTransferService;
             _diskProvider = diskProvider;
             _mediaFileAttributeService = mediaFileAttributeService;
@@ -61,7 +64,9 @@ namespace NzbDrone.Core.MediaFiles
         public MovieFile MoveMovieFile(MovieFile movieFile, Movie movie)
         {
             var newFileName = _buildFileNames.BuildFileName(movie, movieFile);
-            var filePath = _buildFileNames.BuildFilePath(movie, newFileName, Path.GetExtension(movieFile.RelativePath));
+            var path = _buildMoviePaths.BuildPath(movie, false);
+
+            var filePath = _buildFileNames.BuildFilePath(path, newFileName, Path.GetExtension(movieFile.RelativePath));
 
             EnsureMovieFolder(movieFile, movie, filePath);
 
@@ -117,7 +122,9 @@ namespace NzbDrone.Core.MediaFiles
                 throw new SameFilenameException("File not moved, source and destination are the same", movieFilePath);
             }
 
-            movieFile.RelativePath = movie.Path.GetRelativePath(destinationFilePath);
+            var destinationPath = _buildMoviePaths.BuildPath(movie, false);
+
+            movieFile.RelativePath = destinationPath.GetRelativePath(destinationFilePath);
 
             if (localMovie is not null && _scriptImportDecider.TryImport(movieFilePath, destinationFilePath, localMovie, movieFile, mode) is var scriptImportDecision && scriptImportDecision != ScriptImportDecision.DeferMove)
             {
@@ -143,7 +150,7 @@ namespace NzbDrone.Core.MediaFiles
 
             try
             {
-                _mediaFileAttributeService.SetFolderLastWriteTime(movie.Path, movieFile.DateAdded);
+                _mediaFileAttributeService.SetFolderLastWriteTime(destinationPath, movieFile.DateAdded);
             }
             catch (Exception ex)
             {
