@@ -206,6 +206,7 @@ namespace NzbDrone.Core.Parser
         private static readonly Regex CommonWordRegex = new Regex(@"\b(a|an|the|and|or|of)\b\s?", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private static readonly Regex SpecialEpisodeWordRegex = new Regex(@"\b(part|special|edition|christmas)\b\s?", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private static readonly Regex DuplicateSpacesRegex = new Regex(@"\s{2,}", RegexOptions.Compiled);
+        private static readonly Regex NamerDuplicateRegex = new Regex(@"_\d$", RegexOptions.Compiled);
 
         private static readonly Regex EmojiRegex = new Regex(@"\p{Cs}", RegexOptions.Compiled);
         private static readonly Regex UniCodeRegex = new Regex(@"[^\u0000-\u007F]+", RegexOptions.Compiled);
@@ -600,6 +601,7 @@ namespace NzbDrone.Core.Parser
             title = PunctuationRegex.Replace(title, " ");
             title = EmojiRegex.Replace(title, " ");
             title = UniCodeRegex.Replace(title, " ");
+            title = NamerDuplicateRegex.Replace(title, " ");
             title = DuplicateSpacesRegex.Replace(title, " ");
 
             return title.Trim()

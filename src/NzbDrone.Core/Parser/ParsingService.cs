@@ -89,6 +89,10 @@ namespace NzbDrone.Core.Parser
 
                     return movie;
                 }
+                else
+                {
+                    _logger.Debug("Could not find Studio name. '{0}'", parsedMovieInfo.StudioTitle);
+                }
             }
             else
             {

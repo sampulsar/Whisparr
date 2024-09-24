@@ -156,10 +156,12 @@ namespace NzbDrone.Core.Test.MovieTests.MovieServiceTests
         }
 
         [TestCase("Studio 2020-05-29 Title Vol 1 E2", 2)]
+        [TestCase("Studio 2020-05-29 Title Vol 1 E2_1", 2)]
         [TestCase("[Studio] Quinn Waters (Title / 08.01.2021) [2021 г., Big Tits, Blowjob, Brunette, Chubby, Curvy, Cowgirl, Reverse Cowgirl, Cumshots, Facials, Long Hair, Doggy Style, Hardcore, Missionary, PAWG, POV, Trimmed Pussy, Tattoo, Czech, VR, 8K, 3840p] [Oculus Rift / Vive]", 7)]
         [TestCase("Studio.21.01.08.Title", 7)]
         [TestCase("Studio.21.01.08.Quinn Waters", 7)]
         [TestCase("Studio.21.01.08.Quinn", 7)]
+        [TestCase("Studio.21.01.09.Quinn and Carrie", 8)]
         [TestCase("Studio.21.01.09.Quinn & Carrie", 8)]
         [TestCase("Studio.21.01.09.Quinn & Carrie - Other Title", 8)]
         [TestCase("Studio.21.01.08.Carrie", 10)]
