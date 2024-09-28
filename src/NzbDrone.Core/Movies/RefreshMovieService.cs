@@ -174,9 +174,9 @@ namespace NzbDrone.Core.Movies
 
             movie.MovieMetadata = movieMetadata;
 
-            if (!movie.HasFile)
+            var movieFolderExists = _diskProvider.FolderExists(movie.Path);
+            if (!movie.HasFile && !movieFolderExists)
             {
-                var movieFolderExists = _diskProvider.FolderExists(movie.Path);
                 var path = movie.Path;
                 movie.Path = _buildMoviePaths.BuildPath(movie, false);
                 if (path != movie.Path)
