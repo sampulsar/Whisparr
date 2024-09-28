@@ -96,7 +96,7 @@ namespace NzbDrone.Core.MediaFiles
                 try
                 {
                     _logger.Debug("Renaming movie file: {0}", movieFile);
-                    _movieFileMover.MoveMovieFile(movieFile, movie);
+                    _movieFileMover.MoveMovieFile(movieFile, movie, true);
 
                     movie.Path = _buildMoviePaths.BuildPath(movie, false);
                     _mediaFileService.Update(movieFile);

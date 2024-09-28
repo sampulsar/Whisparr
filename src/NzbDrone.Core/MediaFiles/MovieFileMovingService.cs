@@ -17,7 +17,7 @@ namespace NzbDrone.Core.MediaFiles
 {
     public interface IMoveMovieFiles
     {
-        MovieFile MoveMovieFile(MovieFile movieFile, Movie movie);
+        MovieFile MoveMovieFile(MovieFile movieFile, Movie movie, bool renameFolder = false);
         MovieFile MoveMovieFile(MovieFile movieFile, LocalMovie localMovie);
         MovieFile CopyMovieFile(MovieFile movieFile, LocalMovie localMovie);
     }
@@ -61,10 +61,14 @@ namespace NzbDrone.Core.MediaFiles
             _logger = logger;
         }
 
-        public MovieFile MoveMovieFile(MovieFile movieFile, Movie movie)
+        public MovieFile MoveMovieFile(MovieFile movieFile, Movie movie, bool renameFolder = false)
         {
             var newFileName = _buildFileNames.BuildFileName(movie, movieFile);
-            var path = _buildMoviePaths.BuildPath(movie, false);
+            var path = movie.Path;
+            if (renameFolder || !movie.HasFile)
+            {
+                path = _buildMoviePaths.BuildPath(movie, false);
+            }
 
             var filePath = _buildFileNames.BuildFilePath(path, newFileName, Path.GetExtension(movieFile.RelativePath));
 
