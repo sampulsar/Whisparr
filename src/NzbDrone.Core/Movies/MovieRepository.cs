@@ -23,7 +23,6 @@ namespace NzbDrone.Core.Movies
         List<Movie> FindByStudioAndDate(string studioForeignId, string date);
         List<Movie> GetByStudioForeignId(string studioForeignId);
         List<Movie> GetByPerformerForeignId(string performerForeignId);
-        bool MatchByDate(string studioForeignId);
         List<Movie> MoviesBetweenDates(DateTime start, DateTime end, bool includeUnmonitored);
         PagingSpec<Movie> MoviesWithoutFiles(PagingSpec<Movie> pagingSpec);
         List<Movie> GetMoviesByFileId(int fileId);
@@ -182,45 +181,6 @@ namespace NzbDrone.Core.Movies
 
                     return movie;
                 }).AsList();
-        }
-
-        public bool MatchByDate(string studioForeignId)
-        {
-            try
-            {
-                if (!string.IsNullOrEmpty(studioForeignId))
-                {
-                    var builder = new SqlBuilder(_database.DatabaseType)
-                               .Join<Movie, MovieMetadata>((m, p) => m.MovieMetadataId == p.Id)
-                               .Where<MovieMetadata>(x => x.StudioForeignId == studioForeignId);
-
-                    var movies = _database.QueryJoined<Movie, MovieMetadata>(
-                        builder,
-                        (movie, metadata) =>
-                        {
-                            movie.MovieMetadata = metadata;
-
-                            return movie;
-                        }).ToList().OrderBy(x => x.MovieMetadata.Value.ReleaseDate);
-
-                    var releaseDate = movies.FirstOrDefault().MovieMetadata.Value.ReleaseDate;
-
-                    foreach (var movie in movies)
-                    {
-                        if (releaseDate == movie.MovieMetadata.Value.ReleaseDate)
-                        {
-                            return false;
-                        }
-                    }
-
-                    return true;
-                }
-            }
-            catch (Exception)
-            {
-            }
-
-            return true;
         }
 
         public List<Movie> GetByStudioForeignId(string studioForeignId)
