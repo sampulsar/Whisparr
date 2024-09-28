@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NLog;
+using NzbDrone.Common.Disk;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Instrumentation.Extensions;
 using NzbDrone.Core.AutoTagging;
@@ -27,6 +28,8 @@ namespace NzbDrone.Core.Movies
         private readonly IMovieService _movieService;
         private readonly IMovieMetadataService _movieMetadataService;
         private readonly IRootFolderService _folderService;
+        private readonly IDiskProvider _diskProvider;
+        private readonly IBuildMoviePaths _buildMoviePaths;
         private readonly IAlternativeTitleService _titleService;
         private readonly IAddPerformerService _performerService;
         private readonly IAddStudioService _studioService;
@@ -41,6 +44,8 @@ namespace NzbDrone.Core.Movies
                                     IMovieService movieService,
                                     IMovieMetadataService movieMetadataService,
                                     IRootFolderService folderService,
+                                    IDiskProvider diskProvider,
+                                    IBuildMoviePaths buildMoviePaths,
                                     IAlternativeTitleService titleService,
                                     IAddStudioService studioService,
                                     IAddPerformerService performerService,
@@ -55,6 +60,8 @@ namespace NzbDrone.Core.Movies
             _movieService = movieService;
             _movieMetadataService = movieMetadataService;
             _folderService = folderService;
+            _diskProvider = diskProvider;
+            _buildMoviePaths = buildMoviePaths;
             _titleService = titleService;
             _studioService = studioService;
             _performerService = performerService;
@@ -166,6 +173,18 @@ namespace NzbDrone.Core.Movies
             _movieMetadataService.Upsert(movieMetadata);
 
             movie.MovieMetadata = movieMetadata;
+
+            if (!movie.HasFile)
+            {
+                var movieFolderExists = _diskProvider.FolderExists(movie.Path);
+                var path = movie.Path;
+                movie.Path = _buildMoviePaths.BuildPath(movie, false);
+                if (path != movie.Path)
+                {
+                    _logger.ProgressInfo("Updating path for {0} to {1}", movie.Title, movie.Path);
+                    _movieService.UpdateMovie(movie);
+                }
+            }
 
             _logger.Debug("Finished movie metadata refresh for {0}", movieMetadata.Title);
             _eventAggregator.PublishEvent(new MovieUpdatedEvent(movie));
