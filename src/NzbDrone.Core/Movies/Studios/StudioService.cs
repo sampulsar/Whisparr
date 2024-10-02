@@ -64,6 +64,7 @@ namespace NzbDrone.Core.Movies.Studios
                 }
             }
 
+            _aliases.Add("ExCoGiGirls", "Exploited College Girls");
             _aliases.Add("bex", "Brazzers Exxtra");
             _aliases.Add("lanewgirl", "L.A. New Girl");
             _aliases.Add("Nubiles", "Nubiles.net");
