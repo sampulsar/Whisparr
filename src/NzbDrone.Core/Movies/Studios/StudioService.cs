@@ -64,7 +64,10 @@ namespace NzbDrone.Core.Movies.Studios
                 }
             }
 
-            _aliases.Add("ExCoGiGirls", "Exploited College Girls");
+            _aliases.Add("karupsha", "Karups Hometown Amateurs");
+            _aliases.Add("karupsow", "Karups Older Women");
+            _aliases.Add("karupspc", "Karups Private Collection");
+            _aliases.Add("ExCoGi", "Exploited College Girls");
             _aliases.Add("bex", "Brazzers Exxtra");
             _aliases.Add("lanewgirl", "L.A. New Girl");
             _aliases.Add("Nubiles", "Nubiles.net");
@@ -183,7 +186,7 @@ namespace NzbDrone.Core.Movies.Studios
         {
             var studioAliases = new List<string>();
 
-            var aliasList = _aliases.Where(x => x.Key.CleanStudioTitle() == title.CleanStudioTitle()).ToList();
+            var aliasList = _aliases.Where(x => x.Key.CleanStudioTitle() == title.CleanStudioTitle() || x.Value.CleanStudioTitle() == title.CleanStudioTitle()).ToList();
 
             foreach (var alias in aliasList)
             {
@@ -193,7 +196,7 @@ namespace NzbDrone.Core.Movies.Studios
                 }
             }
 
-            var reverseAliasList = _aliases.Where(x => x.Value.CleanStudioTitle() == title.CleanStudioTitle()).ToList();
+            var reverseAliasList = _aliases.Where(x => x.Value.CleanStudioTitle() == title.CleanStudioTitle() || x.Value.CleanStudioTitle() == title.CleanStudioTitle()).ToList();
 
             foreach (var alias in reverseAliasList)
             {
