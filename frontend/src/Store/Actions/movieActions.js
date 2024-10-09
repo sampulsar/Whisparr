@@ -359,7 +359,7 @@ export const actionHandlers = handleThunks({
     request.done((movieids) => {
       const requests = [];
 
-      const chunkSize = 50000;
+      const chunkSize = 5000;
       for (let i = 0; i < movieids.length; i += chunkSize) {
         const chunk = movieids.slice(i, i + chunkSize);
 
