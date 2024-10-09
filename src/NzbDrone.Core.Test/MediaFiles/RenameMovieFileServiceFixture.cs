@@ -51,7 +51,7 @@ namespace NzbDrone.Core.Test.MediaFiles
         private void GivenMovedFiles()
         {
             Mocker.GetMock<IMoveMovieFiles>()
-                  .Setup(s => s.MoveMovieFile(It.IsAny<MovieFile>(), _movie));
+                  .Setup(s => s.MoveMovieFile(It.IsAny<MovieFile>(), _movie, false));
         }
 
         [Test]
@@ -71,7 +71,7 @@ namespace NzbDrone.Core.Test.MediaFiles
             GivenMovieFiles();
 
             Mocker.GetMock<IMoveMovieFiles>()
-                  .Setup(s => s.MoveMovieFile(It.IsAny<MovieFile>(), It.IsAny<Movie>()))
+                  .Setup(s => s.MoveMovieFile(It.IsAny<MovieFile>(), It.IsAny<Movie>(), false))
                   .Throws(new SameFilenameException("Same file name", "Filename"));
 
             Subject.Execute(new RenameFilesCommand(_movie.Id, new List<int> { 1 }));

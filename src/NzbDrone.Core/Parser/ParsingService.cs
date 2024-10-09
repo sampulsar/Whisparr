@@ -153,7 +153,7 @@ namespace NzbDrone.Core.Parser
         {
             FindMovieResult result = null;
 
-            if (parsedMovieInfo.IsScene)
+            if (parsedMovieInfo.IsScene || searchCriteria.Movie.MovieMetadata.Value.StashId.IsNotNullOrWhiteSpace())
             {
                 var studios = _studioService.FindAllByTitle(parsedMovieInfo.StudioTitle);
 
@@ -286,7 +286,7 @@ namespace NzbDrone.Core.Parser
             Movie movie = null;
             try
             {
-                movie = _movieService.FindByStudioAndReleaseDate(studio.ForeignId, airDate, part);
+                movie = _movieService.FindByStudioAndReleaseDate(studio.ForeignId, airDate, part, searchCriteria);
             }
             catch (Exception ex)
             {
