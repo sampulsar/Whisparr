@@ -23,6 +23,7 @@ namespace NzbDrone.Core.ImportLists.StashDB
         {
             Filter = FavoriteFilter.ALL;
             Sort = SceneSort.CREATED;
+            Sort = SceneSort.RELEASED;
             ApiKey = "";
         }
 
@@ -32,7 +33,7 @@ namespace NzbDrone.Core.ImportLists.StashDB
         [FieldDefinition(1, Label = "Favorite Filter", Type = FieldType.Select, SelectOptions = typeof(FavoriteFilter), HelpText = "Filter by favorited entity")]
         public FavoriteFilter Filter { get; set; }
 
-        [FieldDefinition(2, Label = "Sort Date Descending", Type = FieldType.Select, SelectOptions = typeof(SceneSort), HelpText = "Descending sort by date style")]
+        [FieldDefinition(2, Label = "Sort Date Descending", Type =FieldType.Select, SelectOptions =typeof(SceneSort), HelpText = "Descending sort by date style")]
         public SceneSort Sort { get; set; }
 
         public NzbDroneValidationResult Validate()
