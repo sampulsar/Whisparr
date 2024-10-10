@@ -81,6 +81,12 @@ namespace NzbDrone.Core.MediaFiles
 
         public MovieFile MoveMovieFile(MovieFile movieFile, LocalMovie localMovie)
         {
+            // Recalculate the movie Path
+            if (!localMovie.Movie.HasFile)
+            {
+                localMovie.Movie.Path = _buildMoviePaths.BuildPath(localMovie.Movie, false);
+            }
+
             var newFileName = _buildFileNames.BuildFileName(localMovie.Movie, movieFile);
             var filePath = _buildFileNames.BuildFilePath(localMovie.Movie, newFileName, Path.GetExtension(localMovie.Path));
 
