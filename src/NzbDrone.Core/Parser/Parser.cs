@@ -634,6 +634,16 @@ namespace NzbDrone.Core.Parser
             return SimpleReleaseTitleRegex.Replace(title, string.Empty);
         }
 
+        public static string StripSpaces(this string title)
+        {
+            if (title.IsNullOrWhiteSpace())
+            {
+                return string.Empty;
+            }
+
+            return title.Replace(" ", string.Empty);
+        }
+
         public static string TrimAtEnd(this string title, string textToTrim)
         {
             if (title.IsNullOrWhiteSpace())

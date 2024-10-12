@@ -89,6 +89,10 @@ namespace NzbDrone.Core.Test.MovieTests.MovieServiceTests
                                         .With(x => x.Title = "Episode 200: Violet & Victor")
                                         .With(x => x.MovieMetadata.Value.ReleaseDate = "2024-08-15")
                                         .With(x => x.MovieMetadata.Value.Credits = bellaCredits)
+                                        .TheNext(1)
+                                        .With(x => x.Title = "Cash For Kisses On Valentines Day - S25:E7")
+                                        .With(x => x.MovieMetadata.Value.ReleaseDate = "2024-02-07")
+                                        .With(x => x.MovieMetadata.Value.Credits = credits)
                                         .TheRest()
                                         .With(x => x.Title = "Title")
                                         .With(x => x.MovieMetadata.Value.ReleaseDate = "2024-06-12")
@@ -132,6 +136,10 @@ namespace NzbDrone.Core.Test.MovieTests.MovieServiceTests
                 .Setup(s => s.FindByStudioAndDate(It.Is<string>(s => s.Equals("Bellesa House")), It.Is<string>(d => d.Equals("2024-08-15"))))
                 .Returns(scenes.Where(s => s.MovieMetadata.Value.ReleaseDate.Equals("2024-08-15")).Append(scenes.First()).ToList());
 
+            Mocker.GetMock<IMovieRepository>()
+                .Setup(s => s.FindByStudioAndDate(It.Is<string>(s => s.Equals("Step Siblings Caught")), It.Is<string>(d => d.Equals("2024-02-07"))))
+                .Returns(scenes.Where(s => s.MovieMetadata.Value.ReleaseDate.Equals("2024-02-07")).Append(scenes.First()).ToList());
+
             _candidates = Builder<Movie>.CreateListOfSize(3)
                                         .TheFirst(1)
                                         .With(x => x.MovieMetadata.Value.CleanTitle = "batman")
@@ -168,6 +176,8 @@ namespace NzbDrone.Core.Test.MovieTests.MovieServiceTests
         [TestCase("Studio.21.01.08.Carrie Sage", 10)]
         [TestCase("Studio - 2024-07-30 - Milk & Chocolate Before Bed", 6)]
         [TestCase("Bellesa House 2024-08-15 Episode 200 Violet And Victor", 16)]
+        [TestCase("Bellesa House 2024-08-15 Episode 200 Violet & Victor", 16)]
+        [TestCase("Step Siblings Caught 2024-02-07 Cash For Kisses On Valentines Day - S25E7", 17)]
         public void should_find_by_studio_and_release_date(string title, int id)
         {
             var parsedMovieInfo = Parser.Parser.ParseMovieTitle(title);

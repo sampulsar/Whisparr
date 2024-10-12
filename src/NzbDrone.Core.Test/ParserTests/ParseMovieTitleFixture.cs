@@ -39,6 +39,7 @@ namespace NzbDrone.Core.Test.ParserTests
         [TestCase("Studio.22.10.18.Title.XXX.720p.HEVC.x265.PRT[XvX]", "Studio")]
         [TestCase("Studio - 2017-08-04 - Some Title. [WEBDL-480p]", "Studio")]
         [TestCase("Studio - Performer Name - Some Title (10.01.2024)", "Studio")]
+        [TestCase("Step Siblings Caught 2024-02-07 Cash For Kisses On Valentines Day - S25E7", "Step Siblings Caught")]
         public void should_correctly_parse_studio_names(string title, string result)
         {
             Parser.Parser.ParseMovieTitle(title).StudioTitle.Should().Be(result);
@@ -56,6 +57,7 @@ namespace NzbDrone.Core.Test.ParserTests
         [TestCase("Studio.22.10.18.Title.XXX.720p.HEVC.x265.PRT[XvX]", "2022-10-18")]
         [TestCase("Studio - 2017-08-04 - Some Title. [WEBDL-480p]", "2017-08-04")]
         [TestCase("Studio - Performer Name - Some Title (10.01.2024)", "2024-01-10")]
+        [TestCase("Step Siblings Caught 2024-02-07 Cash For Kisses On Valentines Day - S25E7", "2024-02-07")]
         public void should_correctly_parse_release_date(string title, string result)
         {
             Parser.Parser.ParseMovieTitle(title).ReleaseDate.Should().Be(result);
