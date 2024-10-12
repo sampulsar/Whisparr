@@ -451,6 +451,13 @@ namespace NzbDrone.Core.Movies
                     continue;
                 }
 
+                if (cleanTitle.IsNotNullOrWhiteSpace() && Parser.Parser.StripSpaces(parsedMovieTitle).Equals(Parser.Parser.StripSpaces(cleanTitle)))
+                {
+                    _logger.Debug("Match {0} against {1} [Title]", parsedMovieTitle, cleanTitle);
+                    matches.Add(movie);
+                    continue;
+                }
+
                 if (matchLevel > 5)
                 {
                     continue;
