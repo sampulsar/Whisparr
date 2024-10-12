@@ -135,16 +135,19 @@ namespace NzbDrone.Core.Notifications.Email
             using var client = new SmtpClient();
             client.Timeout = 10000;
 
-            var useEncyption = (EmailEncryptionType)settings.UseEncryption;
+            var serverOption = SecureSocketOptions.Auto;
 
-            var serverOption = useEncyption switch
+            if (settings.RequireEncryption)
             {
-                EmailEncryptionType.Always => settings.Port == 465
-                    ? SecureSocketOptions.SslOnConnect
-                    : SecureSocketOptions.StartTls,
-                EmailEncryptionType.Never => SecureSocketOptions.None,
-                _ => SecureSocketOptions.Auto
-            };
+                if (settings.Port == 465)
+                {
+                    serverOption = SecureSocketOptions.SslOnConnect;
+                }
+                else
+                {
+                    serverOption = SecureSocketOptions.StartTls;
+                }
+            }
 
             client.ServerCertificateValidationCallback = _certificateValidationService.ShouldByPassValidationError;
 

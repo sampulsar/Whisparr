@@ -25,7 +25,7 @@ import toggleSelected from 'Utilities/Table/toggleSelected';
 import QueueFilterModal from './QueueFilterModal';
 import QueueOptionsConnector from './QueueOptionsConnector';
 import QueueRowConnector from './QueueRowConnector';
-import RemoveQueueItemModal from './RemoveQueueItemModal';
+import RemoveQueueItemsModal from './RemoveQueueItemsModal';
 
 class Queue extends Component {
 
@@ -307,16 +307,9 @@ class Queue extends Component {
           }
         </PageContentBody>
 
-        <RemoveQueueItemModal
+        <RemoveQueueItemsModal
           isOpen={isConfirmRemoveModalOpen}
           selectedCount={selectedCount}
-          canChangeCategory={isConfirmRemoveModalOpen && (
-            selectedIds.every((id) => {
-              const item = items.find((i) => i.id === id);
-
-              return !!(item && item.downloadClientHasPostImportCategory);
-            })
-          )}
           canIgnore={isConfirmRemoveModalOpen && (
             selectedIds.every((id) => {
               const item = items.find((i) => i.id === id);
@@ -324,7 +317,7 @@ class Queue extends Component {
               return !!(item && item.movieId);
             })
           )}
-          pending={isConfirmRemoveModalOpen && (
+          allPending={isConfirmRemoveModalOpen && (
             selectedIds.every((id) => {
               const item = items.find((i) => i.id === id);
 

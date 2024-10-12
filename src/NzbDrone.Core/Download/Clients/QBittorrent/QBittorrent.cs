@@ -10,7 +10,6 @@ using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Http;
 using NzbDrone.Core.Blocklisting;
 using NzbDrone.Core.Configuration;
-using NzbDrone.Core.Localization;
 using NzbDrone.Core.MediaFiles.TorrentInfo;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.RemotePathMappings;
@@ -36,10 +35,9 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
                            IDiskProvider diskProvider,
                            IRemotePathMappingService remotePathMappingService,
                            ICacheManager cacheManager,
-                           ILocalizationService localizationService,
                            IBlocklistService blocklistService,
                            Logger logger)
-            : base(torrentFileInfoReader, httpClient, configService, diskProvider, remotePathMappingService, localizationService, blocklistService, logger)
+            : base(torrentFileInfoReader, httpClient, configService, diskProvider, remotePathMappingService, blocklistService, logger)
         {
             _proxySelector = proxySelector;
 
@@ -229,7 +227,7 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
                     Category = torrent.Category.IsNotNullOrWhiteSpace() ? torrent.Category : torrent.Label,
                     Title = torrent.Name,
                     TotalSize = torrent.Size,
-                    DownloadClientInfo = DownloadClientItemClientInfo.FromDownloadClient(this, Settings.MovieImportedCategory.IsNotNullOrWhiteSpace()),
+                    DownloadClientInfo = DownloadClientItemClientInfo.FromDownloadClient(this),
                     RemainingSize = (long)(torrent.Size * (1.0 - torrent.Progress)),
                     RemainingTime = GetRemainingTime(torrent),
                     SeedRatio = torrent.Ratio
@@ -611,7 +609,7 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
             }
             else if (torrent.RatioLimit == -2 && config.MaxRatioEnabled)
             {
-                if (Math.Round(torrent.Ratio, 2) >= config.MaxRatio)
+                if (torrent.Ratio >= config.MaxRatio)
                 {
                     return true;
                 }

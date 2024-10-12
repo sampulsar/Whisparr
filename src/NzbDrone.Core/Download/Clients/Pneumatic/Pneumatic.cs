@@ -9,7 +9,6 @@ using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Http;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Indexers;
-using NzbDrone.Core.Localization;
 using NzbDrone.Core.Organizer;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.RemotePathMappings;
@@ -24,9 +23,8 @@ namespace NzbDrone.Core.Download.Clients.Pneumatic
                          IConfigService configService,
                          IDiskProvider diskProvider,
                          IRemotePathMappingService remotePathMappingService,
-                         Logger logger,
-                         ILocalizationService localizationService)
-            : base(configService, diskProvider, remotePathMappingService, logger, localizationService)
+                         Logger logger)
+            : base(configService, diskProvider, remotePathMappingService, logger)
         {
             _httpClient = httpClient;
         }
@@ -75,7 +73,7 @@ namespace NzbDrone.Core.Download.Clients.Pneumatic
 
                 var historyItem = new DownloadClientItem
                 {
-                    DownloadClientInfo = DownloadClientItemClientInfo.FromDownloadClient(this, false),
+                    DownloadClientInfo = DownloadClientItemClientInfo.FromDownloadClient(this),
                     DownloadId = GetDownloadClientId(file),
                     Title = title,
 

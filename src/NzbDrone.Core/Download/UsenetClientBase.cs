@@ -6,7 +6,6 @@ using NzbDrone.Common.Http;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Exceptions;
 using NzbDrone.Core.Indexers;
-using NzbDrone.Core.Localization;
 using NzbDrone.Core.Organizer;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.RemotePathMappings;
@@ -25,9 +24,8 @@ namespace NzbDrone.Core.Download
                                    IDiskProvider diskProvider,
                                    IRemotePathMappingService remotePathMappingService,
                                    IValidateNzbs nzbValidationService,
-                                   Logger logger,
-                                   ILocalizationService localizationService)
-            : base(configService, diskProvider, remotePathMappingService, logger, localizationService)
+                                   Logger logger)
+            : base(configService, diskProvider, remotePathMappingService, logger)
         {
             _httpClient = httpClient;
             _nzbValidationService = nzbValidationService;

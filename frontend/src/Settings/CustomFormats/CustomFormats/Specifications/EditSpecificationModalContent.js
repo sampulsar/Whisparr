@@ -49,7 +49,7 @@ function EditSpecificationModalContent(props) {
           {...otherProps}
         >
           {
-            fields && fields.some((x) => x.label === translate('CustomFormatsSpecificationRegularExpression')) &&
+            fields && fields.some((x) => x.label === 'Regular Expression') &&
               <Alert kind={kinds.INFO}>
                 <div>
                   <div dangerouslySetInnerHTML={{ __html: translate('ThisConditionMatchesUsingRegularExpressions', ['<code>\\^$.|?*+()[{</code>', '<code>\\</code>']) }} />

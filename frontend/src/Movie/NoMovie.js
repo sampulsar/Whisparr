@@ -26,7 +26,7 @@ function NoMovie(props) {
 
       <div className={styles.buttonContainer}>
         <Button
-          to="/add/import/movies"
+          to="/add/import"
           kind={kinds.PRIMARY}
         >
           {translate('ImportExistingMovies')}

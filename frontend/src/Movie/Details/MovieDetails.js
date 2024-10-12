@@ -235,7 +235,7 @@ class MovieDetails extends Component {
       certification,
       ratings,
       path,
-      statistics,
+      sizeOnDisk,
       qualityProfileId,
       monitored,
       studioTitle,
@@ -263,10 +263,6 @@ class MovieDetails extends Component {
       movieRuntimeFormat,
       safeForWorkMode
     } = this.props;
-
-    const {
-      sizeOnDisk = 0
-    } = statistics;
 
     const {
       isOrganizeModalOpen,
@@ -676,7 +672,7 @@ MovieDetails.propTypes = {
   certification: PropTypes.string,
   ratings: PropTypes.object.isRequired,
   path: PropTypes.string.isRequired,
-  statistics: PropTypes.object.isRequired,
+  sizeOnDisk: PropTypes.number.isRequired,
   qualityProfileId: PropTypes.number.isRequired,
   monitored: PropTypes.bool.isRequired,
   status: PropTypes.string.isRequired,
@@ -714,9 +710,9 @@ MovieDetails.propTypes = {
 
 MovieDetails.defaultProps = {
   genres: [],
-  statistics: {},
   tags: [],
-  isSaving: false
+  isSaving: false,
+  sizeOnDisk: 0
 };
 
 export default MovieDetails;

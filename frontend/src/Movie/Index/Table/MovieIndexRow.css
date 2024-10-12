@@ -32,7 +32,6 @@
 }
 
 .releaseDate,
-.releaseGroups,
 .genres {
   composes: cell;
 

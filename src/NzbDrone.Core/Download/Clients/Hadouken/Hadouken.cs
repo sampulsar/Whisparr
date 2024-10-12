@@ -9,7 +9,6 @@ using NzbDrone.Common.Http;
 using NzbDrone.Core.Blocklisting;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Download.Clients.Hadouken.Models;
-using NzbDrone.Core.Localization;
 using NzbDrone.Core.MediaFiles.TorrentInfo;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.RemotePathMappings;
@@ -27,10 +26,9 @@ namespace NzbDrone.Core.Download.Clients.Hadouken
                         IConfigService configService,
                         IDiskProvider diskProvider,
                         IRemotePathMappingService remotePathMappingService,
-                        ILocalizationService localizationService,
                         IBlocklistService blocklistService,
                         Logger logger)
-            : base(torrentFileInfoReader, httpClient, configService, diskProvider, remotePathMappingService, localizationService, blocklistService, logger)
+            : base(torrentFileInfoReader, httpClient, configService, diskProvider, remotePathMappingService, blocklistService, logger)
         {
             _proxy = proxy;
         }
@@ -70,7 +68,7 @@ namespace NzbDrone.Core.Download.Clients.Hadouken
 
                 var item = new DownloadClientItem
                 {
-                    DownloadClientInfo = DownloadClientItemClientInfo.FromDownloadClient(this, false),
+                    DownloadClientInfo = DownloadClientItemClientInfo.FromDownloadClient(this),
                     DownloadId = torrent.InfoHash.ToUpper(),
                     OutputPath = outputPath + torrent.Name,
                     RemainingSize = torrent.TotalSize - torrent.DownloadedBytes,

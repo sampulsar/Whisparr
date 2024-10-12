@@ -60,18 +60,12 @@ class CalendarEvent extends Component {
               {title}
             </div>
 
-            <div
-              className={classNames(
-                styles.statusContainer,
-                fullColorEvents && 'fullColor'
-              )}
-            >
+            <div className={styles.statusContainer}>
               {
                 queueItem ?
                   <span className={styles.statusIcon}>
                     <CalendarEventQueueDetails
                       {...queueItem}
-                      fullColorEvents={fullColorEvents}
                     />
                   </span> :
                   null
@@ -88,14 +82,12 @@ class CalendarEvent extends Component {
               }
 
               {
-                showCutoffUnmetIcon &&
-                !!movieFile &&
-                movieFile.qualityCutoffNotMet ?
+                showCutoffUnmetIcon && !!movieFile && movieFile.qualityCutoffNotMet ?
                   <Icon
                     className={styles.statusIcon}
                     name={icons.MOVIE_FILE}
                     kind={kinds.WARNING}
-                    title={translate('QualityCutoffNotMet')}
+                    title={translate('QualityCutoffHasNotBeenMet')}
                   /> :
                   null
               }

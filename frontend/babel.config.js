@@ -2,8 +2,6 @@ const loose = true;
 
 module.exports = {
   plugins: [
-    '@babel/plugin-transform-logical-assignment-operators',
-
     // Stage 1
     '@babel/plugin-proposal-export-default-from',
     ['@babel/plugin-transform-optional-chaining', { loose }],

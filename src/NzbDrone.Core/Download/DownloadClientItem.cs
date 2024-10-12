@@ -38,10 +38,8 @@ namespace NzbDrone.Core.Download
         public string Type { get; set; }
         public int Id { get; set; }
         public string Name { get; set; }
-        public bool HasPostImportCategory { get; set; }
 
-        public static DownloadClientItemClientInfo FromDownloadClient<TSettings>(
-            DownloadClientBase<TSettings> downloadClient, bool hasPostImportCategory)
+        public static DownloadClientItemClientInfo FromDownloadClient<TSettings>(DownloadClientBase<TSettings> downloadClient)
             where TSettings : IProviderConfig, new()
         {
             return new DownloadClientItemClientInfo
@@ -49,8 +47,7 @@ namespace NzbDrone.Core.Download
                 Protocol = downloadClient.Protocol,
                 Type = downloadClient.Name,
                 Id = downloadClient.Definition.Id,
-                Name = downloadClient.Definition.Name,
-                HasPostImportCategory = hasPostImportCategory
+                Name = downloadClient.Definition.Name
             };
         }
     }

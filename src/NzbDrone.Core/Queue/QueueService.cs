@@ -75,9 +75,7 @@ namespace NzbDrone.Core.Queue
                 Movie = movie,
                 DownloadClient = trackedDownload.DownloadItem.DownloadClientInfo.Name,
                 Indexer = trackedDownload.Indexer,
-                OutputPath = trackedDownload.DownloadItem.OutputPath.ToString(),
-                Added = trackedDownload.Added,
-                DownloadClientHasPostImportCategory = trackedDownload.DownloadItem.DownloadClientInfo.HasPostImportCategory
+                OutputPath = trackedDownload.DownloadItem.OutputPath.ToString()
             };
 
             queue.Id = HashConverter.GetHashInt31($"trackedDownload-{trackedDownload.DownloadClient}-{trackedDownload.DownloadItem.DownloadId}");

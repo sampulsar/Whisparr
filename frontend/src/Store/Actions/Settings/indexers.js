@@ -99,12 +99,7 @@ export default {
     items: [],
     pendingChanges: {},
     sortKey: 'name',
-    sortDirection: sortDirections.ASCENDING,
-    sortPredicates: {
-      name: function(item) {
-        return item.name.toLowerCase();
-      }
-    }
+    sortDirection: sortDirections.DESCENDING
   },
 
   //
@@ -155,13 +150,7 @@ export default {
       delete selectedSchema.name;
 
       selectedSchema.fields = selectedSchema.fields.map((field) => {
-        const newField = { ...field };
-
-        if (newField.privacy === 'apiKey' || newField.privacy === 'password') {
-          newField.value = '';
-        }
-
-        return newField;
+        return { ...field };
       });
 
       newState.selectedSchema = selectedSchema;

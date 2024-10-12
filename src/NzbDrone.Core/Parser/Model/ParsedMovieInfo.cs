@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Languages;
 using NzbDrone.Core.Qualities;
 
@@ -23,7 +22,6 @@ namespace NzbDrone.Core.Parser.Model
         public string ReleaseGroup { get; set; }
         public string ReleaseHash { get; set; }
         public string ReleaseDate { get; set; }
-        public string Episode { get; set; }
         public string Edition { get; set; }
         public int Year { get; set; }
         public string ImdbId { get; set; }
@@ -50,7 +48,7 @@ namespace NzbDrone.Core.Parser.Model
         {
             get
             {
-                return ReleaseDate.IsNotNullOrWhiteSpace() || Episode.IsNotNullOrWhiteSpace();
+                return !string.IsNullOrWhiteSpace(ReleaseDate);
             }
 
             private set

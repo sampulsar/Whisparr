@@ -12,12 +12,6 @@ export interface Collection {
   title: string;
 }
 
-export interface Statistics {
-  movieFileCount: number;
-  releaseGroups: string[];
-  sizeOnDisk: number;
-}
-
 export interface Ratings {
   imdb: object;
   tmdb: object;
@@ -47,9 +41,9 @@ interface Movie extends ModelBase {
   originalLanguage: Language;
   runtime: number;
   path: string;
+  sizeOnDisk: number;
   genres: string[];
   ratings: Ratings;
-  statistics: Statistics;
   tags: number[];
   images: Image[];
   movieFile: MovieFile;

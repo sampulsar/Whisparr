@@ -732,7 +732,7 @@
     "DefaultDelayProfile": "هذا هو ملف التعريف الافتراضي. ينطبق هذا على جميع الأفلام التي ليس لها ملف تعريف صريح.",
     "DefaultCase": "الحالة الافتراضية",
     "Debug": "تصحيح",
-    "DatabaseMigration": "ترحيل DB",
+    "DBMigration": "ترحيل DB",
     "Days": "أيام",
     "Day": "يوم",
     "Dates": "تواريخ",

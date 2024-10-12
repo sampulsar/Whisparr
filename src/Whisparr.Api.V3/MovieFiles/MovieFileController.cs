@@ -58,26 +58,34 @@ namespace Whisparr.Api.V3.MovieFiles
 
         [HttpGet]
         [Produces("application/json")]
-        public List<MovieFileResource> GetMovieFiles([FromQuery(Name = "movieId")] List<int> movieIds, [FromQuery] List<int> movieFileIds)
+        public List<MovieFileResource> GetMovieFiles(int? movieId, [FromQuery] List<int> movieFileIds)
         {
-            if (!movieIds.Any() && !movieFileIds.Any())
+            if (!movieId.HasValue && !movieFileIds.Any())
             {
                 throw new BadRequestException("movieId or movieFileIds must be provided");
             }
 
-            var movieFiles = movieIds.Any()
-                ? _mediaFileService.GetFilesByMovies(movieIds)
-                : _mediaFileService.GetMovies(movieFileIds);
-
-            if (movieFiles == null)
+            if (movieId.HasValue)
             {
-                return new List<MovieFileResource>();
-            }
+                var movie = _movieService.GetMovie(movieId.Value);
+                var file = _mediaFileService.GetFilesByMovie(movieId.Value).FirstOrDefault();
 
-            return movieFiles.GroupBy(e => e.MovieId)
-                .SelectMany(f => f.ToList()
-                    .ConvertAll(e => e.ToResource(_movieService.GetMovie(f.Key), _qualityUpgradableSpecification, _formatCalculator)))
-                .ToList();
+                if (file == null)
+                {
+                    return new List<MovieFileResource>();
+                }
+
+                return new List<MovieFileResource> { file.ToResource(movie, _qualityUpgradableSpecification, _formatCalculator) };
+            }
+            else
+            {
+                var movieFiles = _mediaFileService.GetMovies(movieFileIds);
+
+                return movieFiles.GroupBy(e => e.MovieId)
+                                   .SelectMany(f => f.ToList()
+                                                     .ConvertAll(e => e.ToResource(_movieService.GetMovie(f.Key), _qualityUpgradableSpecification, _formatCalculator)))
+                                   .ToList();
+            }
         }
 
         [RestPutById]

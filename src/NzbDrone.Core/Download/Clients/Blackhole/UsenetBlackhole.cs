@@ -7,7 +7,6 @@ using NzbDrone.Common.Disk;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Http;
 using NzbDrone.Core.Configuration;
-using NzbDrone.Core.Localization;
 using NzbDrone.Core.Organizer;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.RemotePathMappings;
@@ -26,9 +25,8 @@ namespace NzbDrone.Core.Download.Clients.Blackhole
                                IDiskProvider diskProvider,
                                IRemotePathMappingService remotePathMappingService,
                                IValidateNzbs nzbValidationService,
-                               Logger logger,
-                               ILocalizationService localizationService)
-            : base(httpClient, configService, diskProvider, remotePathMappingService, nzbValidationService, logger, localizationService)
+                               Logger logger)
+            : base(httpClient, configService, diskProvider, remotePathMappingService, nzbValidationService, logger)
         {
             _scanWatchFolder = scanWatchFolder;
 
@@ -61,7 +59,7 @@ namespace NzbDrone.Core.Download.Clients.Blackhole
             {
                 yield return new DownloadClientItem
                 {
-                    DownloadClientInfo = DownloadClientItemClientInfo.FromDownloadClient(this, false),
+                    DownloadClientInfo = DownloadClientItemClientInfo.FromDownloadClient(this),
                     DownloadId = Definition.Name + "_" + item.DownloadId,
                     Category = "Whisparr",
                     Title = item.Title,

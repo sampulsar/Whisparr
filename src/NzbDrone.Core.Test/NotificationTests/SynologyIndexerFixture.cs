@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Moq;
 using NUnit.Framework;
 using NzbDrone.Core.MediaFiles;
@@ -33,16 +33,16 @@ namespace NzbDrone.Core.Test.NotificationTests
                     RelativePath = "moviefile1.mkv"
                 },
 
-                OldMovieFiles = new List<DeletedMovieFile>
+                OldMovieFiles = new List<MovieFile>
                 {
-                    new DeletedMovieFile(new MovieFile
+                    new MovieFile
                     {
                         RelativePath = "oldmoviefile1.mkv"
-                    }, null),
-                    new DeletedMovieFile(new MovieFile
+                    },
+                    new MovieFile
                     {
                         RelativePath = "oldmoviefile2.mkv"
-                    }, null)
+                    }
                 }
             };
 

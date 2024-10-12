@@ -60,7 +60,7 @@
     "CancelPendingTask": "Вы уверены, что хотите убрать данную задачу из очереди?",
     "Cancel": "Отменить",
     "Calendar": "Календарь",
-    "DatabaseMigration": "Перенос БД",
+    "DBMigration": "Перенос БД",
     "Day": "День",
     "Dates": "Даты",
     "Date": "Дата",

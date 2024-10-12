@@ -126,7 +126,7 @@ class CalendarHeader extends Component {
               isDisabled={view === calendarViews.AGENDA}
               onPress={onTodayPress}
             >
-              {translate('Today')}
+              Today
             </Button>
           </div>
 

@@ -214,8 +214,6 @@ module.exports = {
   calendarTextDim: '#eee',
   calendarTextDimAlternate: '#fff',
 
-  calendarFullColorFilter: 'grayscale(90%) contrast(200%) saturate(50%)',
-
   //
   // Table
 

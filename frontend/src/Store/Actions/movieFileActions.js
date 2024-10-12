@@ -99,11 +99,6 @@ export const defaultState = {
       isVisible: true
     },
     {
-      name: 'dateAdded',
-      label: () => translate('Added'),
-      isVisible: false
-    },
-    {
       name: 'actions',
       columnLabel: () => translate('Actions'),
       label: React.createElement(IconButton, { name: icons.ADVANCED_SETTINGS }),

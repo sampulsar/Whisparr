@@ -133,7 +133,7 @@ class AgendaEvent extends Component {
                   className={styles.statusIcon}
                   name={icons.MOVIE_FILE}
                   kind={kinds.WARNING}
-                  title={translate('QualityCutoffNotMet')}
+                  title={translate('QualityCutoffHasNotBeenMet')}
                 />
             }
           </div>

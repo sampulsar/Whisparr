@@ -235,7 +235,7 @@
     "DelayProfile": "Perfil de atraso",
     "DefaultDelayProfile": "Este é o perfil padrão. Ele se aplica a todos os filmes que não possuem um perfil explícito.",
     "Debug": "Depuração",
-    "DatabaseMigration": "Migração de banco de dados",
+    "DBMigration": "Migração de banco de dados",
     "Dates": "Datas",
     "Days": "Dias",
     "Day": "Dia",

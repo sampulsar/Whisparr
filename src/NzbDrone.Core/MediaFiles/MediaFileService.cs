@@ -16,7 +16,6 @@ namespace NzbDrone.Core.MediaFiles
         void Update(List<MovieFile> movieFile);
         void Delete(MovieFile movieFile, DeleteMediaFileReason reason);
         List<MovieFile> GetFilesByMovie(int movieId);
-        List<MovieFile> GetFilesByMovies(IEnumerable<int> movieIds);
         List<MovieFile> GetFilesWithoutMediaInfo();
         List<string> FilterExistingFiles(List<string> files, Movie movie);
         MovieFile GetMovie(int id);
@@ -79,11 +78,6 @@ namespace NzbDrone.Core.MediaFiles
         public List<MovieFile> GetFilesByMovie(int movieId)
         {
             return _mediaFileRepository.GetFilesByMovie(movieId);
-        }
-
-        public List<MovieFile> GetFilesByMovies(IEnumerable<int> movieIds)
-        {
-            return _mediaFileRepository.GetFilesByMovies(movieIds);
         }
 
         public List<MovieFile> GetFilesWithoutMediaInfo()

@@ -4,8 +4,4 @@
 
 .icon {
   margin-right: 5px;
-
-  &:global(.fullColorEvents) {
-    filter: var(--calendarFullColorFilter)
-  }
 }

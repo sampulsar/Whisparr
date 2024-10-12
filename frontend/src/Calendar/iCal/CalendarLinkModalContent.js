@@ -109,7 +109,7 @@ class CalendarLinkModalContent extends Component {
     return (
       <ModalContent onModalClose={onModalClose}>
         <ModalHeader>
-          {translate('CalendarFeed')}
+          {translate('WhisparrCalendarFeed')}
         </ModalHeader>
 
         <ModalBody>
@@ -121,19 +121,19 @@ class CalendarLinkModalContent extends Component {
                 type={inputTypes.CHECK}
                 name="unmonitored"
                 value={unmonitored}
-                helpText={translate('ICalIncludeUnmonitoredMoviesHelpText')}
+                helpText={translate('UnmonitoredHelpText')}
                 onChange={this.onInputChange}
               />
             </FormGroup>
 
             <FormGroup>
-              <FormLabel>{translate('ICalShowAsAllDayEvents')}</FormLabel>
+              <FormLabel>{translate('ShowAsAllDayEvents')}</FormLabel>
 
               <FormInputGroup
                 type={inputTypes.CHECK}
                 name="asAllDay"
                 value={asAllDay}
-                helpText={translate('ICalShowAsAllDayEventsHelpText')}
+                helpText={translate('AsAllDayHelpText')}
                 onChange={this.onInputChange}
               />
             </FormGroup>
@@ -145,7 +145,7 @@ class CalendarLinkModalContent extends Component {
                 type={inputTypes.TAG}
                 name="tags"
                 value={tags}
-                helpText={translate('ICalTagsMoviesHelpText')}
+                helpText={translate('TagsHelpText')}
                 onChange={this.onInputChange}
               />
             </FormGroup>
@@ -160,7 +160,7 @@ class CalendarLinkModalContent extends Component {
                 name="iCalHttpUrl"
                 value={iCalHttpUrl}
                 readOnly={true}
-                helpText={translate('ICalFeedHelpText')}
+                helpText={translate('ICalHttpUrlHelpText')}
                 buttons={[
                   <ClipboardButton
                     key="copy"

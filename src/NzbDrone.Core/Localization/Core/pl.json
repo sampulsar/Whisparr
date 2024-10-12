@@ -165,7 +165,7 @@
     "AddDownloadClient": "Dodaj klienta pobierania",
     "AfterManualRefresh": "Po ręcznym odświeżeniu",
     "Dates": "Daktyle",
-    "DatabaseMigration": "Migracja bazy danych",
+    "DBMigration": "Migracja bazy danych",
     "AllFiles": "Wszystkie pliki",
     "CalendarOptions": "Opcje kalendarza",
     "CantFindMovie": "Dlaczego nie mogę znaleźć mojego filmu?",

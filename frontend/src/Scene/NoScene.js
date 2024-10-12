@@ -26,7 +26,7 @@ function NoScene(props) {
 
       <div className={styles.buttonContainer}>
         <Button
-          to="/add/import/scenes"
+          to="/add/import"
           kind={kinds.PRIMARY}
         >
           {translate('ImportExistingScenes')}

@@ -8,7 +8,6 @@ using NzbDrone.Common.Disk;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Http;
 using NzbDrone.Core.Configuration;
-using NzbDrone.Core.Localization;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.RemotePathMappings;
 using NzbDrone.Core.Validation;
@@ -25,9 +24,8 @@ namespace NzbDrone.Core.Download.Clients.NzbVortex
                        IDiskProvider diskProvider,
                        IRemotePathMappingService remotePathMappingService,
                        IValidateNzbs nzbValidationService,
-                       Logger logger,
-                       ILocalizationService localizationService)
-            : base(httpClient, configService, diskProvider, remotePathMappingService, nzbValidationService, logger, localizationService)
+                       Logger logger)
+            : base(httpClient, configService, diskProvider, remotePathMappingService, nzbValidationService, logger)
         {
             _proxy = proxy;
         }
@@ -68,7 +66,7 @@ namespace NzbDrone.Core.Download.Clients.NzbVortex
             {
                 var queueItem = new DownloadClientItem();
 
-                queueItem.DownloadClientInfo = DownloadClientItemClientInfo.FromDownloadClient(this, false);
+                queueItem.DownloadClientInfo = DownloadClientItemClientInfo.FromDownloadClient(this);
                 queueItem.DownloadId = vortexQueueItem.AddUUID ?? vortexQueueItem.Id.ToString();
                 queueItem.Category = vortexQueueItem.GroupName;
                 queueItem.Title = vortexQueueItem.UiTitle;
