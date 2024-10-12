@@ -570,14 +570,6 @@ namespace NzbDrone.Core.Movies
                     matches.Add(movie);
                     continue;
                 }
-
-                var wordLimit = 3;
-                if (parsedMovieTitle.Split(" ").Length > wordLimit & parsedMovieTitle.Contains(cleanTitle))
-                {
-                    // matches.Add(movie);
-                    _logger.Debug("Possible match {0} against {1}", parsedMovieTitle, cleanTitle);
-                    continue;
-                }
             }
 
             if (searchCriteria != null)
