@@ -10,6 +10,7 @@ using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Http;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Exceptions;
+using NzbDrone.Core.Localization;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.RemotePathMappings;
 using NzbDrone.Core.Validation;
@@ -28,8 +29,9 @@ namespace NzbDrone.Core.Download.Clients.Nzbget
                       IDiskProvider diskProvider,
                       IRemotePathMappingService remotePathMappingService,
                       IValidateNzbs nzbValidationService,
-                      Logger logger)
-            : base(httpClient, configService, diskProvider, remotePathMappingService, nzbValidationService, logger)
+                      Logger logger,
+                      ILocalizationService localizationService)
+            : base(httpClient, configService, diskProvider, remotePathMappingService, nzbValidationService, logger, localizationService)
         {
             _proxy = proxy;
         }
@@ -73,7 +75,7 @@ namespace NzbDrone.Core.Download.Clients.Nzbget
                 queueItem.Title = item.NzbName;
                 queueItem.TotalSize = totalSize;
                 queueItem.Category = item.Category;
-                queueItem.DownloadClientInfo = DownloadClientItemClientInfo.FromDownloadClient(this);
+                queueItem.DownloadClientInfo = DownloadClientItemClientInfo.FromDownloadClient(this, false);
                 queueItem.CanMoveFiles = true;
                 queueItem.CanBeRemoved = true;
 
@@ -120,7 +122,7 @@ namespace NzbDrone.Core.Download.Clients.Nzbget
                 var historyItem = new DownloadClientItem();
                 var itemDir = item.FinalDir.IsNullOrWhiteSpace() ? item.DestDir : item.FinalDir;
 
-                historyItem.DownloadClientInfo = DownloadClientItemClientInfo.FromDownloadClient(this);
+                historyItem.DownloadClientInfo = DownloadClientItemClientInfo.FromDownloadClient(this, false);
                 historyItem.DownloadId = droneParameter == null ? item.Id.ToString() : droneParameter.Value.ToString();
                 historyItem.Title = item.Name;
                 historyItem.TotalSize = MakeInt64(item.FileSizeHi, item.FileSizeLo);

@@ -18,6 +18,7 @@ using NzbDrone.Core.Messaging.Events;
 using NzbDrone.Core.Movies;
 using NzbDrone.Core.Movies.Commands;
 using NzbDrone.Core.Movies.Events;
+using NzbDrone.Core.MovieStats;
 using NzbDrone.Core.RootFolders;
 using NzbDrone.Core.Validation;
 using NzbDrone.Core.Validation.Paths;
@@ -40,6 +41,7 @@ namespace Whisparr.Api.V3.Movies
     {
         private readonly IMovieService _moviesService;
         private readonly IAddMovieService _addMovieService;
+        private readonly IMovieStatisticsService _movieStatisticsService;
         private readonly IMapCoversToLocal _coverMapper;
         private readonly IManageCommandQueue _commandQueueManager;
         private readonly IRootFolderService _rootFolderService;
@@ -50,6 +52,7 @@ namespace Whisparr.Api.V3.Movies
         public MovieController(IBroadcastSignalRMessage signalRBroadcaster,
                            IMovieService moviesService,
                            IAddMovieService addMovieService,
+                           IMovieStatisticsService movieStatisticsService,
                            IMapCoversToLocal coverMapper,
                            IManageCommandQueue commandQueueManager,
                            IRootFolderService rootFolderService,
@@ -69,6 +72,7 @@ namespace Whisparr.Api.V3.Movies
         {
             _moviesService = moviesService;
             _addMovieService = addMovieService;
+            _movieStatisticsService = movieStatisticsService;
             _qualityUpgradableSpecification = qualityUpgradableSpecification;
             _configService = configService;
             _coverMapper = coverMapper;
@@ -103,7 +107,7 @@ namespace Whisparr.Api.V3.Movies
         }
 
         [HttpGet]
-        public List<MovieResource> AllMovie(int? tmdbId, bool excludeLocalCovers = false)
+        public List<MovieResource> AllMovie(int? tmdbId, string stashId, bool excludeLocalCovers = false)
         {
             var moviesResources = new List<MovieResource>();
 
@@ -118,11 +122,23 @@ namespace Whisparr.Api.V3.Movies
                     moviesResources.AddIfNotNull(MapToResource(movie));
                 }
             }
+            else if (stashId.IsNotNullOrWhiteSpace())
+            {
+                var movie = _moviesService.FindByForeignId(stashId);
+
+                if (movie != null)
+                {
+                    moviesResources.AddIfNotNull(MapToResource(movie));
+                }
+            }
             else
             {
+                var movieStats = _movieStatisticsService.MovieStatistics();
                 var availDelay = _configService.AvailabilityDelay;
 
                 var movieTask = Task.Run(() => _moviesService.GetAllMovies());
+
+                var sdict = movieStats.ToDictionary(x => x.MovieId);
 
                 if (!excludeLocalCovers)
                 {
@@ -130,7 +146,6 @@ namespace Whisparr.Api.V3.Movies
                 }
 
                 var movies = movieTask.GetAwaiter().GetResult();
-
                 moviesResources = new List<MovieResource>(movies.Count);
 
                 foreach (var movie in movies)
@@ -143,6 +158,8 @@ namespace Whisparr.Api.V3.Movies
                     MapCoversToLocal(moviesResources, coverFileInfos);
                 }
 
+                LinkMovieStatistics(moviesResources, sdict);
+
                 var rootFolders = _rootFolderService.All();
 
                 moviesResources.ForEach(m => m.RootFolderPath = _rootFolderService.GetBestRootFolderPath(m.Path, rootFolders));
@@ -154,6 +171,7 @@ namespace Whisparr.Api.V3.Movies
         protected override MovieResource GetResourceById(int id)
         {
             var movie = _moviesService.GetMovie(id);
+
             return MapToResource(movie);
         }
 
@@ -172,6 +190,8 @@ namespace Whisparr.Api.V3.Movies
         {
             var moviesResources = new List<MovieResource>();
 
+            var movieStats = _movieStatisticsService.MovieStatistics(ids);
+            var sdict = movieStats.ToDictionary(x => x.MovieId);
             var availDelay = _configService.AvailabilityDelay;
             var movies = _moviesService.FindByIds(ids);
 
@@ -179,6 +199,8 @@ namespace Whisparr.Api.V3.Movies
             {
                 moviesResources.Add(movie.ToResource(availDelay, _qualityUpgradableSpecification));
             }
+
+            LinkMovieStatistics(moviesResources, sdict);
 
             return moviesResources;
         }
@@ -194,6 +216,7 @@ namespace Whisparr.Api.V3.Movies
 
             var resource = movie.ToResource(availDelay, _qualityUpgradableSpecification);
             MapCoversToLocal(resource);
+            FetchAndLinkMovieStatistics(resource);
 
             resource.RootFolderPath = _rootFolderService.GetBestRootFolderPath(resource.Path);
 
@@ -250,6 +273,29 @@ namespace Whisparr.Api.V3.Movies
         private void MapCoversToLocal(IEnumerable<MovieResource> movies, Dictionary<string, FileInfo> coverFileInfos)
         {
             _coverMapper.ConvertToLocalUrls(movies.Select(x => Tuple.Create(x.Id, x.Images.AsEnumerable())), coverFileInfos);
+        }
+
+        private void FetchAndLinkMovieStatistics(MovieResource resource)
+        {
+            LinkMovieStatistics(resource, _movieStatisticsService.MovieStatistics(resource.Id));
+        }
+
+        private void LinkMovieStatistics(List<MovieResource> resources, Dictionary<int, MovieStatistics> sDict)
+        {
+            foreach (var movie in resources)
+            {
+                if (sDict.TryGetValue(movie.Id, out var stats))
+                {
+                    LinkMovieStatistics(movie, stats);
+                }
+            }
+        }
+
+        private void LinkMovieStatistics(MovieResource resource, MovieStatistics movieStatistics)
+        {
+            resource.Statistics = movieStatistics.ToResource();
+            resource.HasFile = movieStatistics.MovieFileCount > 0;
+            resource.SizeOnDisk = movieStatistics.SizeOnDisk;
         }
 
         [NonAction]
