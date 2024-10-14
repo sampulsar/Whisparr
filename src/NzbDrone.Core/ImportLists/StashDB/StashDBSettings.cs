@@ -22,7 +22,6 @@ namespace NzbDrone.Core.ImportLists.StashDB
         public StashDBSettings()
         {
             Filter = FavoriteFilter.ALL;
-            Sort = SceneSort.CREATED;
             Sort = SceneSort.RELEASED;
             ApiKey = "";
         }
