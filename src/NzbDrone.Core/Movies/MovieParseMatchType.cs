@@ -9,5 +9,7 @@ namespace NzbDrone.Core.Movies
         Characters = 5,
         PerformerTitle = 6,
         CharacterTitle = 7,
+        PerformersNotTitle = 8,
+        CharactersNotTitle = 9,
     }
 }

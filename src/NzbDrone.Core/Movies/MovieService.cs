@@ -531,6 +531,22 @@ namespace NzbDrone.Core.Movies
                     matches.Add(movie, MovieParseMatchType.CharacterTitle);
                     continue;
                 }
+
+                // If parsed title contains all performer and the not title then consider a match
+                if (cleanPerformers.All(x => parsedMovieTitle.Contains(x)) && !parsedMovieTitle.Contains(cleanTitle))
+                {
+                    _logger.Debug("Match {0} against {1} {2} [Performers & NOT Title]", parsedMovieTitle, cleanTitle, cleanPerformers.Join(", "));
+                    matches.Add(movie, MovieParseMatchType.PerformersNotTitle);
+                    continue;
+                }
+
+                // If parsed title contains all character and the not title then consider a match
+                if (cleanCharacters.Any() && cleanCharacters.All(x => parsedMovieTitle.Contains(x)) && !parsedMovieTitle.Contains(cleanTitle))
+                {
+                    _logger.Debug("Match {0} against {1} {2} [Characters & NOT Title]", parsedMovieTitle, cleanTitle, cleanCharacters.Join(", "));
+                    matches.Add(movie, MovieParseMatchType.CharactersNotTitle);
+                    continue;
+                }
             }
 
             // if (searchCriteria != null)
