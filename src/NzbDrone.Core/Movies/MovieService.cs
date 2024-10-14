@@ -582,6 +582,7 @@ namespace NzbDrone.Core.Movies
                     if (filteredMatches.Count == 1)
                     {
                         matches = filteredMatches;
+                        break;
                     }
                 }
             }
