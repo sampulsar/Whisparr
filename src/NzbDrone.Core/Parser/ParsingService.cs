@@ -153,7 +153,7 @@ namespace NzbDrone.Core.Parser
         {
             FindMovieResult result = null;
 
-            if (parsedMovieInfo.IsScene || searchCriteria.Movie.MovieMetadata.Value.StashId.IsNotNullOrWhiteSpace())
+            if (parsedMovieInfo.IsScene)
             {
                 var studios = _studioService.FindAllByTitle(parsedMovieInfo.StudioTitle);
 
