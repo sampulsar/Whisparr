@@ -65,8 +65,12 @@ namespace NzbDrone.Core.MediaFiles
             foreach (var file in files)
             {
                 var movieFilePath = Path.Combine(movie.Path, file.RelativePath);
+                var path = _buildMoviePaths.BuildPath(movie, false);
+                if (path != null)
+                {
+                    movie.Path = path;
+                }
 
-                movie.Path = _buildMoviePaths.BuildPath(movie, false);
                 var newName = _filenameBuilder.BuildFileName(movie, file);
                 var newPath = _filenameBuilder.BuildFilePath(movie, newName, Path.GetExtension(movieFilePath));
 
@@ -98,7 +102,12 @@ namespace NzbDrone.Core.MediaFiles
                     _logger.Debug("Renaming movie file: {0}", movieFile);
                     _movieFileMover.MoveMovieFile(movieFile, movie, true);
 
-                    movie.Path = _buildMoviePaths.BuildPath(movie, false);
+                    var path = _buildMoviePaths.BuildPath(movie, false);
+                    if (path != null)
+                    {
+                        movie.Path = path;
+                    }
+
                     _mediaFileService.Update(movieFile);
                     _movieService.UpdateMovie(movie);
                     renamed.Add(new RenamedMovieFile

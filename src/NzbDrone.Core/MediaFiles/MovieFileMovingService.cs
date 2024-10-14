@@ -65,10 +65,6 @@ namespace NzbDrone.Core.MediaFiles
         {
             var newFileName = _buildFileNames.BuildFileName(movie, movieFile);
             var path = movie.Path;
-            if (renameFolder || !movie.HasFile)
-            {
-                path = _buildMoviePaths.BuildPath(movie, false);
-            }
 
             var filePath = _buildFileNames.BuildFilePath(path, newFileName, Path.GetExtension(movieFile.RelativePath));
 
@@ -133,6 +129,10 @@ namespace NzbDrone.Core.MediaFiles
             }
 
             var destinationPath = _buildMoviePaths.BuildPath(movie, false);
+            if (string.IsNullOrEmpty(destinationPath))
+            {
+                destinationPath = movie.Path;
+            }
 
             movieFile.RelativePath = destinationPath.GetRelativePath(destinationFilePath);
 
