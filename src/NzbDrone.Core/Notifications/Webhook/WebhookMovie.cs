@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using NzbDrone.Core.MediaFiles;
 using NzbDrone.Core.Movies;
@@ -17,6 +18,7 @@ namespace NzbDrone.Core.Notifications.Webhook
         public string StashId { get; set; }
         public string Overview { get; set; }
         public string ItemType { get; set; }
+        public IEnumerable<string> Tags { get; set; }
 
         public WebhookMovie()
         {
