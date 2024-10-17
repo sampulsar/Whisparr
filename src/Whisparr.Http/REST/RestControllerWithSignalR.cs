@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using NzbDrone.Core.Datastore;
 using NzbDrone.Core.Datastore.Events;
 using NzbDrone.Core.Messaging.Events;
-using NzbDrone.Core.MetadataSource.SkyHook.Resource;
 using NzbDrone.SignalR;
 
 namespace Whisparr.Http.REST
@@ -81,10 +80,6 @@ namespace Whisparr.Http.REST
                 };
 
                 var resorceType = resource.GetType();
-                if (resorceType.Name == typeof(MovieResource).Name)
-                {
-                    return;
-                }
 
                 _signalRBroadcaster.BroadcastMessage(signalRMessage);
             }

@@ -61,11 +61,15 @@ class MovieCastPoster extends Component {
       width: `${posterWidth}px`
     };
 
-    if (!performer?.foreignId) {
+    if (!performer) {
       return null;
     }
 
-    const link = `/performer/${performer.foreignId}`;
+    if (!performer?.foreignId) {
+      console.log(performer);
+    }
+
+    const link = `/performer/${performer?.foreignId}`;
 
     return (
       <div
@@ -76,7 +80,7 @@ class MovieCastPoster extends Component {
           <div className={styles.controls}>
             <MonitorToggleButton
               className={styles.action}
-              monitored={performer.monitored}
+              monitored={performer?.monitored}
               size={20}
               onPress={onTogglePerformerMonitored}
             />
@@ -90,7 +94,7 @@ class MovieCastPoster extends Component {
                 blur={safeForWorkMode}
                 className={styles.poster}
                 style={elementStyle}
-                images={performer.images}
+                images={performer?.images}
                 size={250}
                 lazy={false}
                 overflow={true}
@@ -100,7 +104,7 @@ class MovieCastPoster extends Component {
 
               {hasPosterError &&
                 <div className={styles.overlayTitle}>
-                  {performer.fullName}
+                  {performer?.fullName}
                 </div>
               }
             </Link>
@@ -108,7 +112,7 @@ class MovieCastPoster extends Component {
         </div>
 
         <div className={styles.title}>
-          {performer.fullName}
+          {performer?.fullName}
         </div>
         <div className={styles.title}>
           {character}
