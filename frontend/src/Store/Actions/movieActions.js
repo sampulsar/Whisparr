@@ -344,6 +344,10 @@ function getSaveAjaxOptions({ ajaxOptions, payload }) {
 export const actionHandlers = handleThunks({
 
   [FETCH_MOVIES]: (getState, payload, dispatch) => {
+    if (getState().movies.isPopulated) {
+      return;
+    }
+
     dispatch(set({ section, isFetching: true }));
 
     const {
@@ -359,7 +363,7 @@ export const actionHandlers = handleThunks({
     request.done((movieids) => {
       const requests = [];
 
-      const chunkSize = 5000;
+      const chunkSize = 10000;
       for (let i = 0; i < movieids.length; i += chunkSize) {
         const chunk = movieids.slice(i, i + chunkSize);
 
